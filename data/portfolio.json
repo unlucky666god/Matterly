@@ -19,12 +19,5 @@
     "client": "Студия «АрхПроект»",
     "comment": "Масштаб 1:200, печать из белого PLA с постобработкой.",
     "image": "portfolio3.jpg"
-  },
-  {
-    "id": 4,
-    "title": "123",
-    "client": "123",
-    "comment": "123",
-    "image": "work_3c4354b32ec642feb35e8c9d061a13a7.webp"
   }
 ]

@@ -2,7 +2,7 @@
 from flask import Flask, render_template, jsonify, session, redirect, url_for, request, flash
 import json
 import os
-import datetime
+from datetime import datetime
 from systemBot import *
 from functools import wraps
 from PIL import Image
@@ -171,7 +171,7 @@ MONTHS = {
 @app.template_filter('format_date')
 def _jinja2_filter_date(date_str):
     try:
-        d = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+        d = datetime.strptime(date_str, '%Y-%m-%d')
         return f"{d.day} {MONTHS[d.month]} {d.year}"
     except (ValueError, KeyError, TypeError):
         return date_str
@@ -711,4 +711,4 @@ def submit_form():
         return redirect(url_for('contacts'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
