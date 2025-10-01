@@ -57,6 +57,8 @@
                             <textarea id="message" name="message" rows="4" required
                                       class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent"></textarea>
                         </div>
+                        <!-- Добавляем скрытое поле для токена -->
+                        <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
                         <div class="g-recaptcha" data-sitekey="6LfFF9srAAAAAKkvUWKXj4gJvKCHkvgjmGadpXGG"></div>
                         <button type="submit"
                                 class="w-full py-3 bg-accent text-dark-900 font-bold rounded-lg hover:bg-opacity-90 transition">
@@ -68,8 +70,7 @@
 
             <!-- Правая колонка: карта -->
             <div class="glass rounded-2xl overflow-hidden h-fit">
-                <h2 class="text-2xl font-bold mb-6 text-text-primary text-center">Наш офис</h2>
-                <!-- Замените src на вашу карту из Яндекс.Карт или Google Maps -->
+                <h2 class="text-2xl font-bold mb-3 mt-3 text-text-primary text-center">Наш офис</h2>
                 <iframe 
                     src="https://yandex.ru/map-widget/v1/?um=constructor%3Aваш_уникальный_ключ&source=constructor" 
                     width="100%" 
@@ -86,20 +87,18 @@
     </div>
 </section>
 
-<!-- capcha js) -->
+<!-- Подключаем reCAPTCHA v2 -->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
 document.getElementById('contact-form').addEventListener('submit', function(e) {
-    e.preventDefault(); // Останавливаем отправку, пока не получим токен
-
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LfFF9srAAAAAKkvUWKXj4gJvKCHkvgjmGadpXGG', {action: 'contact_form'}).then(function(token) {
-            // Вставляем токен в скрытое поле
-            document.getElementById('g-recaptcha-response').value = token;
-            // Теперь отправляем форму
-            document.getElementById('contact-form').submit();
-        });
-    });
+    // Для reCAPTCHA v2 просто проверяем, что капча пройдена
+    var response = grecaptcha.getResponse();
+    if (response.length === 0) {
+        e.preventDefault();
+        alert('Пожалуйста, подтвердите, что вы не робот');
+        return false;
+    }
+    // Если капча пройдена, форма отправится нормально
 });
 </script>
 {% endblock %}

@@ -699,7 +699,7 @@ def submit_form():
             "name": name,
             "email": email,
             "message": message,
-            "timestamp": datetime.datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat()
         }
         messages.append(new_entry)
         save_messages(messages)
@@ -711,4 +711,4 @@ def submit_form():
         return redirect(url_for('contacts'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
