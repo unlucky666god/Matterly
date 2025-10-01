@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /private/
+Disallow: /tmp/
+Disallow: /backup/
+
+Sitemap: https://ваш-сайт.ru/sitemap.xml
+
+Host: matterly.ru

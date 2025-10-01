@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://matterly.ru/</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/catalog</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/services</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/materials</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/portfolio</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/delivery</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/articles</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/contacts</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/catalog?category=%D0%BF%D1%80%D0%BE%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D1%8C</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/articles/vybor-materiala-dlya-3d-pechati</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/articles/promyshlennoe-primenenie-3d-pechati</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://matterly.ru/articles/podgotovka-3d-modeli-k-pechati</loc>
+  <lastmod>2025-10-01T20:48:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+
+
+</urlset>
