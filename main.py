@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, jsonify, session, redirect, url_for, request, current_app
+from flask import Flask, render_template, jsonify, session, redirect, url_for, request, flash
 import json
 import os
 import datetime
@@ -7,6 +7,7 @@ from systemBot import *
 from functools import wraps
 from PIL import Image
 import uuid
+import requests
 
 app = Flask(__name__)
 
@@ -668,31 +669,46 @@ def robotxTxt():
 
 @app.route('/submit', methods=['POST'])
 def submit_form():
-    name = request.form.get('name')
-    email = request.form.get('email')
-    message = request.form.get('message')
+    recaptcha_response = request.form.get('g-recaptcha-response')
+    if not recaptcha_response:
+        flash('Пожалуйста, подтвердите, что вы не робот.', 'error')
+        return redirect(url_for('contacts'))
 
-    # Валидация (можно расширить)
-    if not name or not email or not message:
-        return "Все поля обязательны!", 400
-
-    # Загружаем существующие сообщения
-    messages = load_messages()
-
-    # Добавляем новое сообщение с временной меткой
-    new_entry = {
-        "name": name,
-        "email": email,
-        "message": message,
-        "timestamp": datetime.datetime.now().isoformat()
+    secret_key = '6LfFF9srAAAAAP4JHC7MszPXXzvg6P1IILbRCeli'  # ← ваш Secret Key для v2!
+    verify_url = 'https://www.google.com/recaptcha/api/siteverify'  # ← без пробелов!
+    
+    payload = {
+        'secret': secret_key,
+        'response': recaptcha_response
     }
-    messages.append(new_entry)
+    r = requests.post(verify_url, data=payload)
+    result = r.json()
 
-    # Сохраняем обратно в файл
-    save_messages(messages)
+    if result.get('success'):
+        # Обработка формы
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message = request.form.get('message')
 
-    # Перенаправляем на главную (или можно показать "спасибо")
-    return redirect(url_for('index'))
+        if not name or not email or not message:
+            flash('Все поля обязательны!', 'error')
+            return redirect(url_for('contacts'))
+
+        messages = load_messages()
+        new_entry = {
+            "name": name,
+            "email": email,
+            "message": message,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+        messages.append(new_entry)
+        save_messages(messages)
+
+        flash('Сообщение успешно отправлено!', 'success')
+        return redirect(url_for('contacts'))
+    else:
+        flash('Проверка безопасности не пройдена. Попробуйте ещё раз.', 'error')
+        return redirect(url_for('contacts'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
