@@ -1,0 +1,31 @@
+<!-- templates/article_detail.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | Matterly{% endblock %}
+{% block meta_description %}{{ article.excerpt }}{% endblock %}
+
+{% block content %}
+<section class="py-16 px-4">
+    <div class="max-w-4xl mx-auto">
+        <a href="{{ url_for('articles') }}" class="inline-block mb-6 text-accent hover:underline">&larr; Все статьи</a>
+
+        <article class="glass p-8 rounded-2xl">
+            <time class="text-sm text-gray-500">{{ article.date | format_date }}</time>
+            <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-6 text-text-primary">{{ article.title }}</h1>
+
+            <div class="mb-8">
+                <img src="{{ url_for('static', filename='media/' + article.image) }}" 
+                     alt="{{ article.title }}" 
+                     class="w-full h-64 md:h-96 object-cover rounded-xl">
+            </div>
+
+            <div class="prose prose-lg text-text-secondary max-w-none">
+                <!-- Здесь можно хранить HTML-контент в JSON или использовать Markdown -->
+                <p>Это пример статьи. В реальном проекте вы можете хранить полный текст статьи в JSON, Markdown-файле или базе данных.</p>
+                <p>Например: <strong>PLA</strong> — идеален для начинающих, так как не требует подогрева стола и почти не деформируется при остывании.</p>
+                <p>А <strong>ABS</strong>, напротив, требует закрытой камеры, но даёт очень прочные изделия.</p>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,162 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Matterly — From idea to matter{% endblock %}
+{% block meta_description %}Вы пришли с идеей — уйдёте с готовым изделием. Премиум 3D-печать по всей России. Готово за
+24 часа.{% endblock %}
+{% block og_title %}Matterly — From idea to matter{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+    <div id="hero-3d" class="absolute inset-0 z-0">
+        <!--<div id="hero-shape" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80"></div>-->
+        <video lazy autoplay muted loop playsinline class="hero-video" aria-hidden="true">
+            <source src="{{ url_for('static', filename='media/background.MOV') }}" type="video/mp4">
+            <!-- Fallback: космический градиент -->
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-900 to-black"></div>
+        </video>
+    </div>
+    <div class="relative z-10 text-center px-4 max-w-4xl">
+        <h1 id="hero-title" class="text-4xl md:text-6xl font-bold mb-6 text-text-primary opacity-0">From idea to matter
+            — literally.</h1>
+        <p id="hero-subtitle" class="text-xl mb-8 text-text-secondary opacity-0">Премиум 3D-печать по всей России.
+            Готовы за 24 часа.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="#calculator"
+                class="px-8 py-4 bg-accent text-dark-900 font-bold rounded-full shadow-lg hover:bg-opacity-90 transition transform hover:scale-105 animate-pulse-neon">
+                Заказать изделие
+            </a>
+            <a href="#how-it-works"
+                class="px-8 py-4 glass text-text-primary font-medium backdrop-blur-sm border border-white/10 hover:border-accent transition">
+                Как это работает?
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- УТП -->
+<section id="usp" class="py-20 px-4">
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        {% for item in [
+        {"icon": "⚡", "title": "Скорость", "desc": "Готово за 24–72 часа"},
+        {"icon": "💎", "title": "Качество", "desc": "Промышленная точность, даже в мелочах"},
+        {"icon": "💰", "title": "Цена", "desc": "На 20–30% дешевле конкурентов при том же качестве"}
+        ] %}
+        <div class="glass p-6 text-center tilt" data-tilt data-tilt-max="8" data-tilt-speed="400">
+            <div class="text-4xl mb-4">{{ item.icon }}</div>
+            <h3 class="text-xl font-bold mb-2 text-text-primary">{{ item.title }}</h3>
+            <p class="text-text-secondary">{{ item.desc }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Как это работает -->
+<section id="how-it-works" class="py-20 px-4">
+    <h2 class="text-3xl font-bold text-center mb-16 text-text-primary">Как это работает?</h2>
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for step in [
+        {"title": "Выберите", "desc": "Выберите товар или услугу"},
+        {"title": "Закажите", "desc": "Перейдите на страницу оформления и оформите заказ"},
+        {"title": "Получите", "desc": "Через 48 часов ваш аказ будет у вас"}
+        ] %}
+        <div class="glass p-6 text-center">
+            <div
+                class="w-12 h-12 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-accent text-xl font-bold">
+                {{ loop.index }}
+            </div>
+            <h3 class="font-bold mb-2 text-text-primary">{{ step.title }}</h3>
+            <p class="text-text-secondary text-sm">{{ step.desc }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Категории каталога -->
+<section class="py-20 px-4">
+    <h2 class="text-3xl font-bold text-center mb-16 text-text-primary">Каталог по категориям</h2>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for category in categories %}
+        <a href="{{ url_for('catalog', category=category) }}" 
+           class="group relative block overflow-hidden rounded-2xl glass tilt p-6 text-center hover:bg-accent/5 transition">
+            <div class="text-4xl mb-4">📁</div>
+            <h3 class="text-xl font-bold text-text-primary group-hover:text-accent transition">
+                {{ category|capitalize }}
+            </h3>
+            <p class="text-text-secondary mt-2 text-sm">
+                Посмотреть работы
+            </p>
+            <!-- Стрелка при наведении -->
+            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </div>
+        </a>
+        {% else %}
+        <p class="col-span-full text-center text-gray-500">Категории пока не добавлены.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Галерея -->
+<section class="py-20 px-4">
+    <h2 class="text-3xl font-bold text-center mb-16 text-text-primary">Наши работы</h2>
+    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-6">
+        {% for i in range(6) %}
+        <div class="group relative overflow-hidden rounded-2xl glass tilt" data-tilt>
+            <img src="{{ url_for('static', filename='media/work' + ((i + 1)|string) + '.jpg') }}" alt="Работа {{ i+1 }}"
+                class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
+            <div
+                class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <p class="text-white text-center px-2">Замена детали для станка, PLA, 2 дня</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Hero анимации
+    gsap.fromTo("#hero-title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" });
+    gsap.fromTo("#hero-subtitle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.2, delay: 0.3, ease: "power3.out" });
+
+    // Scroll-triggered анимации
+    gsap.utils.toArray('.glass').forEach(el => {
+        gsap.from(el, {
+            scrollTrigger: {
+                trigger: el,
+                start: "top bottom-=100",
+                toggleActions: "play none none reverse"
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out"
+        });
+    });
+
+    // Инициализация Tilt для 3D-формы и других элементов
+    VanillaTilt.init(document.querySelectorAll(".tilt"), {
+        glare: true,
+        "max-glare": 0.3,
+        scale: 1.05
+    });
+
+    // Параллакс для фона (hero-3d)
+    const hero3d = document.getElementById('hero-3d');
+    const shape = document.getElementById('hero-shape');
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        const offset = scrollY * 0.3; // медленное смещение
+        hero3d.style.transform = `translateY(${offset}px)`;
+    });
+
+    // Дополнительно: можно добавить параллакс и для самой формы (опционально)
+    // Но лучше ограничиться фоном, чтобы не перегружать
+</script>
+{% endblock %}

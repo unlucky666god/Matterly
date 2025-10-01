@@ -1,0 +1,44 @@
+<!-- templates/articles.html -->
+{% extends "base.html" %}
+
+{% block title %}Блог о 3D-печати — советы, кейсы, материалы | Matterly{% endblock %}
+{% block meta_description %}Полезные статьи о 3D-печати: выбор материалов, подготовка моделей, промышленные кейсы и лайфхаки от профессионалов.{% endblock %}
+
+{% block content %}
+<section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-6 text-text-primary">Блог и статьи</h1>
+        <p class="text-center text-text-secondary mb-16 max-w-2xl mx-auto">
+            Полезные материалы, кейсы и советы по 3D-печати — от базовых принципов до промышленных решений.
+        </p>
+
+        {% if articles %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for article in articles %}
+            <a href="{{ url_for('article_detail', slug=article.slug) }}" 
+               class="block group glass rounded-2xl overflow-hidden hover:shadow-xl transition">
+                <div class="h-48 overflow-hidden">
+                    <img src="{{ url_for('static', filename='media/' + article.image) }}" 
+                         alt="{{ article.title }}" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                </div>
+                <div class="p-6">
+                    <time class="text-sm text-gray-500">{{ article.date | format_date }}</time>
+                    <h2 class="text-xl font-bold mt-2 mb-3 group-hover:text-accent transition">
+                        {{ article.title }}
+                    </h2>
+                    <p class="text-text-secondary text-sm">
+                        {{ article.excerpt }}
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+            <p class="text-gray-500">Статьи скоро появятся.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

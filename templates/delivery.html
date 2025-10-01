@@ -1,0 +1,82 @@
+<!-- templates/delivery.html -->
+{% extends "base.html" %}
+
+{% block title %}Доставка 3D-изделий по России и СНГ | Matterly{% endblock %}
+{% block meta_description %}Быстрая и надёжная доставка 3D-печатных изделий по всей России и странам СНГ: до пункта выдачи или курьером до двери.{% endblock %}
+
+{% block content %}
+<section class="py-20 px-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-6 text-text-primary">Доставка</h1>
+        <p class="text-center text-text-secondary mb-12 max-w-2xl mx-auto">
+            Печатаем быстро — доставляем ещё быстрее. Работаем по всей России и странам СНГ.
+        </p>
+
+        <div class="space-y-8">
+            <!-- Основная информация -->
+            <div class="glass p-8 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-4 text-text-primary">Куда доставляем?</h2>
+                <p class="text-text-secondary mb-4">
+                    Мы отправляем заказы <strong>по всей территории России</strong> и в страны СНГ:
+                    <span class="font-medium">Казахстан, Беларусь, Армения, Киргизия, Узбекистан</span> и другие.
+                </p>
+                <p class="text-text-secondary">
+                    Независимо от вашего региона — ваш заказ придёт в срок.
+                </p>
+            </div>
+
+            <!-- Способы доставки -->
+            <div class="glass p-8 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-text-primary">Способы доставки</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Пункт выдачи -->
+                    <div class="border-l-4 border-accent pl-4">
+                        <h3 class="text-xl font-bold mb-2 text-text-primary">До пункта выдачи</h3>
+                        <p class="text-text-secondary">
+                            Быстро, удобно и бесплатно* — вы выбираете ближайший пункт выдачи (ПВЗ) СДЭК, Boxberry, Почты России или другой службы.
+                        </p>
+                    </div>
+                    <!-- Курьер -->
+                    <div class="border-l-4 border-indigo-500 pl-4">
+                        <h3 class="text-xl font-bold mb-2 text-text-primary">Курьером до двери</h3>
+                        <p class="text-text-secondary">
+                            Заказ привезут прямо к вам домой или в офис. Доступно во всех крупных городах России и СНГ.
+                        </p>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-gray-500">
+                    * Бесплатная доставка при заказе от 3 000 ₽. Иначе — от 250 ₽ в зависимости от региона.
+                </p>
+            </div>
+
+            <!-- Сроки -->
+            <div class="glass p-8 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-4 text-text-primary">Сроки доставки</h2>
+                <ul class="space-y-2 text-text-secondary">
+                    <li class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>Москва и СПб:</strong> 1–2 дня</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>Регионы РФ:</strong> 2–5 дней</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>Страны СНГ:</strong> 3–7 дней</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Оплата -->
+            <div class="glass p-8 rounded-2xl text-center">
+                <h2 class="text-2xl font-bold mb-4 text-text-primary">Оплата</h2>
+                <p class="text-text-secondary max-w-2xl mx-auto">
+                    Оплата принимается по факту готовности изделия — после согласования финального макета и стоимости.
+                    Доступны: банковский перевод, СБП, оплата по реквизитам ИП.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

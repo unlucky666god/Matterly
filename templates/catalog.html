@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Каталог 3D-печати — готовые изделия | Matterly{% endblock %}
+{% block meta_description %}Готовые 3D-модели на заказ: от игрушек до промышленных деталей. Быстрая печать, доставка по РФ.{% endblock %}
+
+{% block content %}
+<section class="container mx-auto px-4 py-16">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <h1 class="text-3xl font-bold text-text-primary">Каталог готовых изделий</h1>
+    </div>
+
+    <!-- Фильтр по категориям -->
+    <div class="mb-10">
+        <div class="flex flex-wrap gap-3">
+            <!-- Кнопка "Все категории" -->
+            <a href="{{ url_for('catalog') }}"
+               class="px-4 py-2 rounded-full border transition
+                      {% if not active_category %}
+                          bg-accent text-white border-accent
+                      {% else %}
+                          bg-gray-800 text-white border-gray-700 hover:bg-gray-700
+                      {% endif %}">
+                Все категории
+            </a>
+
+            <!-- Кнопки категорий -->
+            {% for cat in categories %}
+            <a href="{{ url_for('catalog', category=cat) }}"
+               class="px-4 py-2 rounded-full border transition
+                      {% if active_category == cat %}
+                          bg-accent text-white border-accent
+                      {% else %}
+                          bg-gray-800 text-white border-gray-700 hover:bg-gray-700
+                      {% endif %}">
+                {{ cat|capitalize }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Товары -->
+    {% if items %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for item in items %}
+        <a href="{{ url_for('catalog_item', item_id=item.id) }}" class="block glass rounded-2xl overflow-hidden group hover:shadow-xl transition">
+            <img src="{{ url_for('static', filename='media/' + item.image) }}" 
+                 alt="{{ item.name }}" 
+                 class="w-full h-48 object-cover">
+            <div class="p-6">
+                <h3 class="text-xl font-bold group-hover:text-accent transition text-text-primary">{{ item.name }}</h3>
+                <p class="text-gray-300 text-sm mt-2">{{ item.description }}</p>
+                
+                <!-- Цена — белый текст -->
+                <p class="mt-3 text-lg font-semibold text-white">
+                    {% if item.price %}
+                        {{ item.price }} ₽
+                    {% else %}
+                        По запросу
+                    {% endif %}
+                </p>
+                
+                <!-- Кнопка "Подробнее" — белый текст -->
+                <div class="mt-4 w-full py-2 text-center text-white font-medium rounded-lg border border-white/20 group-hover:bg-white/10 transition">
+                    Подробнее →
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <p class="text-gray-400 text-lg">Изделия не найдены.</p>
+        <a href="{{ url_for('catalog') }}" class="mt-4 inline-block text-accent hover:underline">Сбросить фильтры</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

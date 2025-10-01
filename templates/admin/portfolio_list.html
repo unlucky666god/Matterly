@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Портфолио</h1>
+    <a href="{{ url_for('admin_portfolio_form') }}" class="px-4 py-2 bg-accent text-dark-900 font-medium rounded hover:bg-opacity-90">
+        + Добавить работу
+    </a>
+</div>
+
+<div class="space-y-4">
+    {% for project in projects %}
+    <div class="glass p-4 rounded-lg flex justify-between items-center">
+        <div>
+            <h3 class="font-bold">{{ project.title }}</h3>
+            <p class="text-sm text-gray-400">{{ project.client }}</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ url_for('admin_portfolio_form', project_id=project.id) }}" class="px-3 py-1 bg-blue-600 text-white rounded text-sm">Редактировать</a>
+            <form method="POST" action="{{ url_for('admin_portfolio_delete', project_id=project.id) }}" onsubmit="return confirm('Удалить?')">
+                <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded text-sm">Удалить</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-gray-500">Нет работ</p>
+    {% endfor %}
+</div>
+{% endblock %}

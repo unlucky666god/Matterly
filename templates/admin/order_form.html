@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Редактировать заказ #{{ order.order_id }}</h1>
+
+<form method="POST" class="max-w-xl">
+    <div class="mb-4">
+        <label class="block mb-1">Статус</label>
+        <select name="status" class="w-full p-2 bg-gray-800 rounded border border-gray-700 text-white">
+            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>В ожидании</option>
+            <option value="paid" {% if order.status == 'paid' %}selected{% endif %}>Оплачен</option>
+            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Отменён</option>
+        </select>
+    </div>
+    <div class="mb-4 p-4 bg-gray-800/50 rounded">
+        <p><strong>Товар:</strong> {{ order.item_name }}</p>
+        <p><strong>Сумма:</strong> {{ order.amount }} ₽</p>
+        <p><strong>Клиент:</strong> {{ order.name }}</p>
+        <p><strong>Телефон:</strong> {{ order.phone }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+    </div>
+    <button type="submit" class="px-4 py-2 bg-accent text-dark-900 font-bold rounded">Сохранить</button>
+    <a href="{{ url_for('admin_orders') }}" class="ml-2 text-gray-400 hover:underline">Отмена</a>
+</form>
+{% endblock %}

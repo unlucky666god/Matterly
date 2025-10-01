@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">{{ 'Редактировать работу' if project else 'Добавить работу' }}</h1>
+
+<form method="POST" enctype="multipart/form-data" class="max-w-2xl space-y-4">
+    <div>
+        <label class="block mb-1 text-sm">Название *</label>
+        <input type="text" name="title" value="{{ project.title if project }}" required
+            class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+    </div>
+    <div>
+        <label class="block mb-1 text-sm">Клиент *</label>
+        <input type="text" name="client" value="{{ project.client if project }}" required
+            class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+    </div>
+    <div>
+        <label class="block mb-1 text-sm">Комментарий *</label>
+        <textarea name="comment" required
+            class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white h-24">{{ project.comment if project }}</textarea>
+    </div>
+    <!-- Вместо текстового поля "Изображение" -->
+    <div>
+        <label class="block mb-1 text-sm">Изображение *</label>
+        {% if item and item.image %}
+        <div class="mb-2">
+            <img src="{{ url_for('static', filename='media/' + item.image) }}" class="h-24 object-cover rounded">
+        </div>
+        {% endif %}
+        <input type="file" name="image" accept="image/*" {% if not item %}required{% endif %}
+            class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600">
+        <p class="text-xs text-gray-500 mt-1">Поддерживаются JPG, PNG. Будет преобразовано в WebP.</p>
+    </div>
+    <div class="flex gap-3 pt-4">
+        <button type="submit" class="px-6 py-2 bg-accent text-dark-900 font-bold rounded hover:bg-opacity-90">
+            {{ 'Сохранить' if project else 'Добавить' }}
+        </button>
+        <a href="{{ url_for('admin_portfolio') }}" class="px-6 py-2 glass border border-gray-700 rounded">Отмена</a>
+    </div>
+</form>
+{% endblock %}

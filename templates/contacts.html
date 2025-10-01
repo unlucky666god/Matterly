@@ -1,0 +1,91 @@
+<!-- templates/contacts.html -->
+{% extends "base.html" %}
+
+{% block title %}Контакты — 3D-печать на заказ | Matterly{% endblock %}
+{% block meta_description %}Свяжитесь с нами: телефон, email, адрес офиса в Москве. Принимаем заказы по всей России и СНГ.{% endblock %}
+
+{% block content %}
+<section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-6 text-text-primary">Контакты</h1>
+        <p class="text-center text-text-secondary mb-16 max-w-2xl mx-auto">
+            Готовы напечатать вашу идею? Свяжитесь с нами любым удобным способом.
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Левая колонка: информация и форма -->
+            <div class="space-y-8">
+                <!-- Контактная информация -->
+                <div class="glass p-8 rounded-2xl">
+                    <h2 class="text-2xl font-bold mb-6 text-text-primary">Как с нами связаться</h2>
+                    <ul class="space-y-4 text-text-secondary">
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 mt-1">📍</span>
+                            <span>г. Москва, ул. Промышленная, д. 15, офис 302</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 mt-1">📞</span>
+                            <span><a href="tel:+74951234567" class="hover:text-accent transition">+7 (495) 123-45-67</a></span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 mt-1">✉️</span>
+                            <span><a href="mailto:info@3dprintpro.ru" class="hover:text-accent transition">info@3dprintpro.ru</a></span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 mt-1">🕒</span>
+                            <span>Пн–Пт: 9:00–19:00, Сб: 10:00–16:00</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Форма обратной связи -->
+                <div class="glass p-8 rounded-2xl">
+                    <h2 class="text-2xl font-bold mb-6 text-text-primary">Напишите нам</h2>
+                    <form id="contact-form" class="space-y-4" method="POST" action="/submit">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-text-primary mb-1">Имя</label>
+                            <input type="text" id="name" name="name" required
+                                   class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-text-primary mb-1">Email</label>
+                            <input type="email" id="email" name="email" required
+                                   class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-text-primary mb-1">Сообщение</label>
+                            <textarea id="message" name="message" rows="4" required
+                                      class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent"></textarea>
+                        </div>
+                        <button type="submit"
+                                class="w-full py-3 bg-accent text-dark-900 font-bold rounded-lg hover:bg-opacity-90 transition">
+                            Отправить
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Правая колонка: карта -->
+            <div class="glass rounded-2xl overflow-hidden h-fit">
+                <h2 class="text-2xl font-bold mb-6 text-text-primary text-center">Наш офис</h2>
+                <!-- Замените src на вашу карту из Яндекс.Карт или Google Maps -->
+                <iframe 
+                    src="https://yandex.ru/map-widget/v1/?um=constructor%3Aваш_уникальный_ключ&source=constructor" 
+                    width="100%" 
+                    height="400" 
+                    frameborder="0" 
+                    allowfullscreen
+                    class="rounded-xl">
+                </iframe>
+                <p class="text-center text-sm text-gray-500 mt-3">
+                    Москва, ул. Промышленная, 15
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- JS для отправки формы (опционально) -->
+<script>
+</script>
+{% endblock %}

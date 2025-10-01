@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Обращения</h1>
+
+<div class="space-y-4">
+    {% for msg in messages|reverse %}
+    <div class="glass p-5 rounded-lg">
+        <div class="flex justify-between mb-2">
+            <span class="font-bold">{{ msg.name }}</span>
+            <span class="text-sm text-gray-500">{{ msg.timestamp[:10] }}</span>
+        </div>
+        <p class="text-gray-300 mb-2">{{ msg.email }}</p>
+        <p class="text-white mb-4">{{ msg.message }}</p>
+        <form method="POST" action="{{ url_for('admin_contact_delete', timestamp=msg.timestamp) }}" class="inline" onsubmit="return confirm('Удалить обращение?')">
+            <button type="submit" class="text-red-500 hover:underline text-sm">Удалить</button>
+        </form>
+    </div>
+    {% else %}
+    <p class="text-gray-500">Нет обращений</p>
+    {% endfor %}
+</div>
+{% endblock %}

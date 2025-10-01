@@ -1,0 +1,34 @@
+<!-- templates/payment_success.html -->
+{% extends "base.html" %}
+
+{% block title %}Оплата прошла успешно | Matterly{% endblock %}
+{% block meta_description %}Ваш заказ принят! Благодарим за доверие. Начинаем печать уже сегодня.{% endblock %}
+
+{% block content %}
+<section class="py-28 px-4 flex items-center justify-center min-h-screen">
+    <div class="max-w-2xl mx-auto text-center glass p-10 rounded-3xl">
+        <div class="w-20 h-20 mx-auto mb-6 flex items-center justify-center bg-green-500/20 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">Спасибо за заказ!</h1>
+        <p class="text-text-secondary text-lg mb-8">
+            Оплата прошла успешно. Мы уже начали работать над вашим изделием.
+        </p>
+        <p class="text-text-secondary mb-8">
+            В ближайшее время вы получите email с подтверждением и деталями заказа.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{{ url_for('catalog') }}" 
+               class="px-6 py-3 bg-accent text-dark-900 font-bold rounded-full hover:bg-opacity-90 transition">
+                Перейти в каталог
+            </a>
+            <a href="{{ url_for('contacts') }}" 
+               class="px-6 py-3 glass text-text-primary font-medium border border-white/10 hover:border-accent transition">
+                Связаться с нами
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

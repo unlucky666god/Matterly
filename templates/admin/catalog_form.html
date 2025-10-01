@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">{{ 'Редактировать товар' if item else 'Добавить товар' }}</h1>
+
+<form method="POST" enctype="multipart/form-data" class="max-w-2xl space-y-4">
+    <div>
+        <label class="block mb-1 text-sm">Название *</label>
+        <input type="text" name="name" value="{{ item.name if item }}" required
+            class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+    </div>
+    <div>
+        <label class="block mb-1 text-sm">Описание *</label>
+        <textarea name="description" required
+            class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white h-24">{{ item.description if item }}</textarea>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block mb-1 text-sm">Категория *</label>
+            <input type="text" name="category" value="{{ item.category if item }}" required
+                class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+        </div>
+        <div>
+            <label class="block mb-1 text-sm">Материал *</label>
+            <input type="text" name="material" value="{{ item.material if item }}" required
+                class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block mb-1 text-sm">Срок изготовления *</label>
+            <input type="text" name="time" value="{{ item.time if item }}" required
+                class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+        </div>
+        <div>
+            <label class="block mb-1 text-sm">Цена (₽)</label>
+            <input type="number" name="price" value="{{ item.price if item }}"
+                class="w-full p-3 bg-gray-800 rounded border border-gray-700 text-white">
+        </div>
+    </div>
+    <div>
+        <label class="block mb-1 text-sm">Изображение *</label>
+        {% if item and item.image %}
+        <div class="mb-2">
+            <img src="{{ url_for('static', filename='media/' + item.image) }}" class="h-24 object-cover rounded">
+        </div>
+        {% endif %}
+        <input type="file" name="image" accept="image/*" {% if not item %}required{% endif %}
+            class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600">
+        <p class="text-xs text-gray-500 mt-1">Поддерживаются JPG, PNG. Будет преобразовано в WebP.</p>
+    </div>
+    <div class="flex gap-3 pt-4">
+        <button type="submit" class="px-6 py-2 bg-accent text-dark-900 font-bold rounded hover:bg-opacity-90">
+            {{ 'Сохранить' if item else 'Добавить' }}
+        </button>
+        <a href="{{ url_for('admin_catalog') }}" class="px-6 py-2 glass border border-gray-700 rounded">Отмена</a>
+    </div>
+</form>
+{% endblock %}

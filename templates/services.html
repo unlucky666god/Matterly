@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Услуги 3D-печати — прототипирование, моделирование | Matterly{% endblock %}
+{% block meta_description %}Профессиональные услуги 3D-печати: от 3D-моделирования до постобработки. Печать из PLA, ABS, PETG, смолы.{% endblock %}
+
+{% block content %}
+<section class="container mx-auto px-4 py-16">
+    <h1 class="text-3xl font-bold mb-12 text-center">Наши услуги</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="glass p-8 rounded-2xl">
+            <h2 class="text-2xl font-bold mb-4">3D-печать</h2>
+            <p>Печать изделий из PLA, ABS, PETG, TPU, фотополимеров. Точность до 0.05 мм. Макс. размер — 30×30×30 см.</p>
+        </div>
+        <div class="glass p-8 rounded-2xl">
+            <h2 class="text-2xl font-bold mb-4">3D-моделирование</h2>
+            <p>Создадим 3D-модель по вашему описанию, чертежу или сканированию объекта. Форматы: STL, OBJ, STEP.</p>
+        </div>
+        <div class="glass p=8 rounded-2xl">
+            <h2 class="text-2xl font-bold mb-4">Постобработка</h2>
+            <p>Шлифовка, покраска, склейка, металлизация. Делаем изделия гладкими и презентабельными.</p>
+        </div>
+        <div class="glass p-8 rounded-2xl">
+            <h2 class="text-2xl font-bold mb-4">Срочный заказ</h2>
+            <p>Готовы напечатать за 24 часа. Идеально для выставок, презентаций и срочных прототипов.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
