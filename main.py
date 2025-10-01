@@ -18,7 +18,7 @@ app.secret_key = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27a
 
 # Учётные данные админа (в продакшене — храните в .env или БД)
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = '123456'  # ← ОБЯЗАТЕЛЬНО измените!
+ADMIN_PASSWORD = '147852369'  # ← ОБЯЗАТЕЛЬНО измените!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -725,4 +725,4 @@ def submit_form():
         return redirect(url_for('contacts'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
