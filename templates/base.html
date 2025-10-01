@@ -210,32 +210,90 @@
             z-index: 0;
             pointer-events: none;
         }
+
+        /* Анимация бургера → крестика */
+        .burger-active span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .burger-active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-active span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
     </style>
 </head>
 
 <body>
+
 
     <!-- Header -->
     <header class="glass fixed top-4 left-4 right-4 z-50 mx-auto max-w-7xl px-4 py-3 backdrop-blur-sm">
         <div class="flex justify-between items-center">
             <a href="/" class="text-xl font-bold text-accent">Matterly</a>
 
+            <!-- Навигация для десктопа -->
             <nav class="hidden md:flex space-x-6">
                 {% for page in [('catalog', 'Каталог'), ('services', 'Услуги'), ('materials', 'Материалы'),
                 ('portfolio', 'Портфолио'), ('delivery', 'Доставка'), ('articles', 'Статьи'), ('contacts', 'Контакты')]
                 %}
-                <a href="/{{ page[0] }}" class="font-medium text-text-secondary hover:text-accent transition"> {{
-                    page[1] }}</a>
+                <a href="/{{ page[0] }}" class="font-medium text-text-secondary hover:text-accent transition">{{ page[1]
+                    }}</a>
                 {% endfor %}
             </nav>
 
+            <!-- Поиск для десктопа -->
             <form class="relative hidden md:block" method="GET" action="/search">
                 <input type="text" name="q" placeholder="Поиск..."
                     class="px-4 py-2 text-sm rounded-full bg-white/10 backdrop-blur-sm border border-white/20 focus:outline-none focus:ring-1 focus:ring-accent text-text-primary placeholder:text-text-secondary">
                 <button type="submit" class="absolute right-3 top-2.5 text-text-secondary">🔍</button>
             </form>
+
+            <!-- Бургер-кнопка ТОЛЬКО на мобильных -->
+            <button id="mobile-menu-button"
+                class="md:hidden flex flex-col justify-center items-center p-3 rounded-lg hover:bg-gray-800 transition z-50">
+                <span class="w-6 h-0.5 bg-text-primary mb-1 transition-transform origin-center"></span>
+                <span class="w-6 h-0.5 bg-text-primary mb-1 transition-all"></span>
+                <span class="w-6 h-0.5 bg-text-primary transition-transform origin-center"></span>
+            </button>
         </div>
     </header>
+
+    <!-- Мобильное меню (ВНЕ header!) -->
+    <div id="mobile-menu-overlay"
+        class="fixed inset-0 bg-black bg-opacity-60 z-40 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden">
+    </div>
+
+    <div id="mobile-menu"
+        class="fixed top-0 right-0 h-full w-4/5 max-w-xs bg-dark-900 bg-opacity-90 backdrop-blur-xl border-l border-gray-700 z-50 transform translate-x-full transition-transform duration-300 ease-in-out p-6 flex flex-col md:hidden">
+        <div class="flex justify-between items-center mb-10 mt-6">
+            <span class="text-xl font-bold text-text-primary">Меню</span>
+            <button id="close-menu"
+                class="text-text-primary hover:text-accent text-3xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-800 transition">
+                &times;
+            </button>
+        </div>
+
+        <nav class="flex flex-col space-y-6 flex-1">
+            <a href="/" class="text-lg font-medium text-text-primary hover:text-accent transition py-2">Главная</a>
+            <a href="/catalog"
+                class="text-lg font-medium text-text-primary hover:text-accent transition py-2">Каталог</a>
+            <a href="/services"
+                class="text-lg font-medium text-text-primary hover:text-accent transition py-2">Услуги</a>
+            <a href="/portfolio"
+                class="text-lg font-medium text-text-primary hover:text-accent transition py-2">Портфолио</a>
+            <a href="/articles"
+                class="text-lg font-medium text-text-primary hover:text-accent transition py-2">Статьи</a>
+            <a href="/contacts"
+                class="text-lg font-medium text-text-primary hover:text-accent transition py-2">Контакты</a>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-gray-700">
+            <p class="text-sm text-gray-400">© 2025 Matterly</p>
+        </div>
+    </div>
 
     <main class="pt-24 pb-16">
         {% block content %}{% endblock %}
@@ -290,6 +348,41 @@
                     });
                 });
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const closeMenu = document.getElementById('close-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-menu-overlay');
+
+            if (!menuButton || !mobileMenu || !overlay) return;
+
+            const openMenu = () => {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('translate-x-0');
+                overlay.classList.remove('pointer-events-none', 'opacity-0');
+                overlay.classList.add('opacity-100');
+                document.body.classList.add('overflow-hidden');
+                menuButton.classList.add('burger-active'); // ✅ активный бургер
+            };
+
+            const closeMenuHandler = () => {
+                mobileMenu.classList.remove('translate-x-0');
+                mobileMenu.classList.add('translate-x-full');
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('pointer-events-none', 'opacity-0');
+                document.body.classList.remove('overflow-hidden');
+                menuButton.classList.remove('burger-active'); // ✅ сброс
+            };
+
+            menuButton.addEventListener('click', openMenu);
+            closeMenu.addEventListener('click', closeMenuHandler);
+            overlay.addEventListener('click', closeMenuHandler);
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', closeMenuHandler);
+            });
         });
     </script>
 

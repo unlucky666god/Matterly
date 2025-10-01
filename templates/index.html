@@ -78,8 +78,8 @@
     <h2 class="text-3xl font-bold text-center mb-16 text-text-primary">Каталог по категориям</h2>
     <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for category in categories %}
-        <a href="{{ url_for('catalog', category=category) }}" 
-           class="group relative block overflow-hidden rounded-2xl glass tilt p-6 text-center hover:bg-accent/5 transition">
+        <a href="{{ url_for('catalog', category=category) }}"
+            class="group relative block overflow-hidden rounded-2xl glass tilt p-6 text-center hover:bg-accent/5 transition">
             <div class="text-4xl mb-4">📁</div>
             <h3 class="text-xl font-bold text-text-primary group-hover:text-accent transition">
                 {{ category|capitalize }}
@@ -89,8 +89,10 @@
             </p>
             <!-- Стрелка при наведении -->
             <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
             </div>
         </a>
@@ -158,5 +160,32 @@
 
     // Дополнительно: можно добавить параллакс и для самой формы (опционально)
     // Но лучше ограничиться фоном, чтобы не перегружать
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var lazyVideos = [].slice.call(document.querySelectorAll("video.lazy"));
+
+        if ("IntersectionObserver" in window) {
+            var lazyVideoObserver = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (video) {
+                    if (video.isIntersecting) {
+                        for (var source in video.target.children) {
+                            var videoSource = video.target.children[source];
+                            if (typeof videoSource.tagName === "string" && videoSource.tagName === "SOURCE") {
+                                videoSource.src = videoSource.dataset.src;
+                            }
+                        }
+
+                        video.target.load();
+                        video.target.classList.remove("lazy");
+                        lazyVideoObserver.unobserve(video.target);
+                    }
+                });
+            });
+
+            lazyVideos.forEach(function (lazyVideo) {
+                lazyVideoObserver.observe(lazyVideo);
+            });
+        }
+    });
 </script>
 {% endblock %}
