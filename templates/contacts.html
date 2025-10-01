@@ -2,7 +2,8 @@
 {% extends "base.html" %}
 
 {% block title %}Контакты — 3D-печать на заказ | Matterly{% endblock %}
-{% block meta_description %}Свяжитесь с нами: телефон, email, адрес офиса в Москве. Принимаем заказы по всей России и СНГ.{% endblock %}
+{% block meta_description %}Свяжитесь с нами: телефон, email, адрес офиса в Москве. Принимаем заказы по всей России и
+СНГ.{% endblock %}
 
 {% block content %}
 <section class="py-20 px-4">
@@ -21,19 +22,20 @@
                     <ul class="space-y-4 text-text-secondary">
                         <li class="flex items-start">
                             <span class="text-accent mr-3 mt-1">📍</span>
-                            <span>г. Москва, ул. Промышленная, д. 15, офис 302</span>
+                            <span>г. Москва, ул. Ландышевая 12с2</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-accent mr-3 mt-1">📞</span>
-                            <span><a href="tel:+74951234567" class="hover:text-accent transition">+7 (495) 123-45-67</a></span>
+                            <span><a href="tel:+74951234567" class="hover:text-accent transition">+7 (905) 742-37-37</a></span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-accent mr-3 mt-1">✉️</span>
-                            <span><a href="mailto:info@3dprintpro.ru" class="hover:text-accent transition">info@3dprintpro.ru</a></span>
+                            <span><a href="mailto:info@3dprintpro.ru"
+                                    class="hover:text-accent transition">info@3dprintpro.ru</a></span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-accent mr-3 mt-1">🕒</span>
-                            <span>Пн–Пт: 9:00–19:00, Сб: 10:00–16:00</span>
+                            <span>Ежедневно: 9:00–21:00</span>
                         </li>
                     </ul>
                 </div>
@@ -45,23 +47,24 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-text-primary mb-1">Имя</label>
                             <input type="text" id="name" name="name" required
-                                   class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent">
+                                class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent">
                         </div>
                         <div>
                             <label for="email" class="block text-sm font-medium text-text-primary mb-1">Email</label>
                             <input type="email" id="email" name="email" required
-                                   class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent">
+                                class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent">
                         </div>
                         <div>
-                            <label for="message" class="block text-sm font-medium text-text-primary mb-1">Сообщение</label>
+                            <label for="message"
+                                class="block text-sm font-medium text-text-primary mb-1">Сообщение</label>
                             <textarea id="message" name="message" rows="4" required
-                                      class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent"></textarea>
+                                class="w-full px-4 py-2 bg-transparent border border-gray-600 rounded-lg focus:outline-none focus:border-accent"></textarea>
                         </div>
                         <!-- Добавляем скрытое поле для токена -->
                         <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
                         <div class="g-recaptcha" data-sitekey="6LfFF9srAAAAAKkvUWKXj4gJvKCHkvgjmGadpXGG"></div>
                         <button type="submit"
-                                class="w-full py-3 bg-accent text-dark-900 font-bold rounded-lg hover:bg-opacity-90 transition">
+                            class="w-full py-3 bg-accent text-dark-900 font-bold rounded-lg hover:bg-opacity-90 transition">
                             Отправить
                         </button>
                     </form>
@@ -71,16 +74,11 @@
             <!-- Правая колонка: карта -->
             <div class="glass rounded-2xl overflow-hidden h-fit">
                 <h2 class="text-2xl font-bold mb-3 mt-3 text-text-primary text-center">Наш офис</h2>
-                <iframe 
-                    src="https://yandex.ru/map-widget/v1/?um=constructor%3Aваш_уникальный_ключ&source=constructor" 
-                    width="100%" 
-                    height="400" 
-                    frameborder="0" 
-                    allowfullscreen
-                    class="rounded-xl">
-                </iframe>
+                <iframe
+                    src="https://yandex.ru/map-widget/v1/?um=constructor%3A63693b6b8faea16fe79d0261d82e27723f50c24eff799c405c7fc3052052e527&amp;source=constructor"
+                    width="550" height="400" frameborder="0" allowfullscreen class="rounded-xl"></iframe>
                 <p class="text-center text-sm text-gray-500 mt-3">
-                    Москва, ул. Промышленная, 15
+                    г. Москва, ул. Ландышевая 12с2
                 </p>
             </div>
         </div>
@@ -90,15 +88,15 @@
 <!-- Подключаем reCAPTCHA v2 -->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
-document.getElementById('contact-form').addEventListener('submit', function(e) {
-    // Для reCAPTCHA v2 просто проверяем, что капча пройдена
-    var response = grecaptcha.getResponse();
-    if (response.length === 0) {
-        e.preventDefault();
-        alert('Пожалуйста, подтвердите, что вы не робот');
-        return false;
-    }
-    // Если капча пройдена, форма отправится нормально
-});
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+        // Для reCAPTCHA v2 просто проверяем, что капча пройдена
+        var response = grecaptcha.getResponse();
+        if (response.length === 0) {
+            e.preventDefault();
+            alert('Пожалуйста, подтвердите, что вы не робот');
+            return false;
+        }
+        // Если капча пройдена, форма отправится нормально
+    });
 </script>
 {% endblock %}

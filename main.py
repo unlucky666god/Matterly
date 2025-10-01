@@ -294,7 +294,7 @@ def payment_success():
 
         # Отправляем уведомление в Telegram
         order_data = next((o for o in orders if o.get('order_id') == order_id), {})
-        send_telegram_order_notification(order_data)
+        send_order_notification(order_data)
 
     return render_template('payment_success.html')
 
@@ -674,26 +674,32 @@ def submit_form():
         flash('Пожалуйста, подтвердите, что вы не робот.', 'error')
         return redirect(url_for('contacts'))
 
-    secret_key = '6LfFF9srAAAAAP4JHC7MszPXXzvg6P1IILbRCeli'  # ← ваш Secret Key для v2!
-    verify_url = 'https://www.google.com/recaptcha/api/siteverify'  # ← без пробелов!
+    secret_key = '6LfFF9srAAAAAP4JHC7MszPXXzvg6P1IILbRCeli'
+    verify_url = 'https://www.google.com/recaptcha/api/siteverify'
     
     payload = {
         'secret': secret_key,
         'response': recaptcha_response
     }
-    r = requests.post(verify_url, data=payload)
-    result = r.json()
+    
+    try:
+        r = requests.post(verify_url, data=payload, timeout=10)
+        result = r.json()
+    except Exception as e:
+        flash('Ошибка проверки безопасности. Попробуйте позже.', 'error')
+        return redirect(url_for('contacts'))
 
     if result.get('success'):
         # Обработка формы
-        name = request.form.get('name')
-        email = request.form.get('email')
-        message = request.form.get('message')
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        message = request.form.get('message', '').strip()
 
         if not name or not email or not message:
             flash('Все поля обязательны!', 'error')
             return redirect(url_for('contacts'))
 
+        # Сохраняем в JSON
         messages = load_messages()
         new_entry = {
             "name": name,
@@ -703,12 +709,20 @@ def submit_form():
         }
         messages.append(new_entry)
         save_messages(messages)
-
-        flash('Сообщение успешно отправлено!', 'success')
+        
+        # Отправляем в Telegram
+        telegram_sent = send_contact_notification(new_entry)
+        
+        if telegram_sent:
+            print("✅ Уведомление успешно отправлено в Telegram")
+        else:
+            print("⚠️ Не удалось отправить уведомление в Telegram")
+        
+        flash('Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.', 'success')
         return redirect(url_for('contacts'))
     else:
         flash('Проверка безопасности не пройдена. Попробуйте ещё раз.', 'error')
         return redirect(url_for('contacts'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
