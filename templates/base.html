@@ -4,23 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Основные мета-теги -->
     <meta name="description"
         content="{% block meta_description %}Matterly — премиум 3D-печать по всей России. Готовы за 24 часа. Точно. Быстро. Без головной боли.{% endblock %}">
     <meta name="keywords"
-        content="3D печать, Matterly, заказ 3D модели, прототипирование, PLA, ABS, PETG, 3D печать за 24 часа">
+        content="{% block meta_keywords %}3D печать, Matterly, заказ 3D модели, прототипирование, PLA, ABS, PETG, 3D печать за 24 часа, 3D печать Москва, 3D принтер заказ{% endblock %}">
+    <meta name="author" content="Matterly">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="color-scheme" content="dark">
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:title" content="{% block og_title %}Matterly — From idea to matter{% endblock %}">
     <meta property="og:description"
         content="{% block og_description %}Вы пришли с идеей — уйдёте с готовым изделием.{% endblock %}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:image" content="{{ url_for('static', filename='media/og-image.jpg', _external=True) }}">
-    <meta name="robots" content="index, follow">
-    <meta name="color-scheme" content="dark">
+    <meta property="og:image" content="{{ url_for('static', filename='media/og-image.webp', _external=True) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Matterly - 3D печать на заказ">
+    <meta property="og:site_name" content="Matterly">
+    <meta property="og:locale" content="ru_RU">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Matterly — From idea to matter{% endblock %}">
+    <meta name="twitter:description"
+        content="{% block twitter_description %}Вы пришли с идеей — уйдёте с готовым изделием.{% endblock %}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='media/og-image.webp', _external=True) }}">
+    <meta name="twitter:site" content="@matterly">
+
+    <!-- Канонические ссылки -->
+    <link rel="canonical" href="{{ request.url }}">
+
+    <!-- Favicon и иконки -->
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='favicon/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="{{ url_for('static', filename='favicon/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="{{ url_for('static', filename='favicon/favicon.ico') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Schema.org структурированные данные -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Matterly",
+        "url": "https://matterly.ru/",
+        "logo": "{{ url_for('static', filename='media/favicon.ico', _external=True) }}",
+        "description": "Премиум 3D-печать по всей России. Готовы за 24 часа. Точно. Быстро. Без головной боли.",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "г. Москва, ул. Ландышевая 12с2",
+            "addressLocality": "Москва",
+            "postalCode": "125466",
+            "addressCountry": "RU"
+        },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+7-905-742-37-37",
+            "contactType": "customer service",
+            "email": "info@matterly.ru",
+            "areaServed": "RU",
+            "availableLanguage": ["Russian", "English"]
+        },
+        "sameAs": [
+            "https://vk.com/matterly",
+            "https://t.me/matterly"
+        ]
+    }
+    </script>
+
+    {% block structured_data %}{% endblock %}
+
     <title>{% block title %}Matterly — From idea to matter{% endblock %}</title>
+
+    <!-- Preload важных ресурсов -->
+    <link rel="preload" href="{{ url_for('static', filename='css/style.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='js/main.js') }}" as="script">
+
+    <!-- DNS-prefetch для внешних ресурсов -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//yandex.ru">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="canonical" href="http://matterly.ru">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
