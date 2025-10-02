@@ -42,7 +42,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for item in items %}
         <a href="{{ url_for('catalog_item', item_id=item.id) }}" class="block glass rounded-2xl overflow-hidden group hover:shadow-xl transition">
-            <img src="{{ url_for('static', filename='media/' + item.image) }}" 
+            <img src="{{ url_for('static', filename='content/' + item.image) }}" 
                  alt="{{ item.name }}" 
                  class="w-full h-48 object-cover">
             <div class="p-6">

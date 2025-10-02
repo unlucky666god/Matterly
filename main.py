@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, jsonify, session, redirect, url_for, request, flash
+from flask import Flask, render_template, jsonify, session, redirect, url_for, request, flash, send_file, abort
 import json
 import os
 from datetime import datetime
@@ -10,6 +10,9 @@ import uuid
 import requests
 import hmac
 import hashlib
+import zipfile
+import io
+from pathlib import Path
 
 app = Flask(__name__)
 
@@ -123,7 +126,7 @@ def save_image_as_webp(image_file):
 
     # Генерируем уникальное имя
     filename = f"work_{uuid.uuid4().hex}.webp"
-    filepath = os.path.join(app.root_path, 'static', 'media', filename)
+    filepath = os.path.join(app.root_path, 'static', 'content', filename)
 
     # Открываем изображение и конвертируем в WebP
     img = Image.open(image_file)
@@ -132,6 +135,33 @@ def save_image_as_webp(image_file):
     img.save(filepath, 'WEBP', quality=85)
 
     return filename
+
+def create_content_zip():
+    """Создает zip-архив папки content"""
+    content_path = os.path.join(app.root_path, 'static', 'content')
+    
+    # Проверяем существование папки
+    if not os.path.exists(content_path):
+        return None
+    
+    # Создаем zip в памяти
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        # Рекурсивно обходим папку content
+        for root, dirs, files in os.walk(content_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                
+                # Создаем относительный путь для архива
+                arcname = os.path.relpath(file_path, content_path)
+                
+                # Добавляем файл в архив
+                zip_file.write(file_path, arcname)
+    
+    # Перемещаем указатель в начало буфера
+    zip_buffer.seek(0)
+    return zip_buffer
 
 @app.route('/order')
 def order_form():
@@ -148,9 +178,9 @@ def index():
     categories = sorted({item['category'] for item in catalog_items if item.get('category')})
     
     directions = [
-        {"title": "Прототипирование", "description": "Быстрое создание моделей для тестирования", "image": "/static/media/proto.jpg"},
-        {"title": "Архитектура", "description": "Макеты зданий и сооружений", "image": "/static/media/arch.jpg"},
-        {"title": "Медицина", "description": "Анатомические модели и протезы", "image": "/static/media/med.jpg"},
+        {"title": "Прототипирование", "description": "Быстрое создание моделей для тестирования", "image": "/static/content/proto.jpg"},
+        {"title": "Архитектура", "description": "Макеты зданий и сооружений", "image": "/static/content/arch.jpg"},
+        {"title": "Медицина", "description": "Анатомические модели и протезы", "image": "/static/content/med.jpg"},
     ]
     return render_template('index.html', directions=directions, categories=categories)
 
@@ -539,7 +569,7 @@ def admin_portfolio():
 @app.route('/admin/orders')
 @login_required
 def admin_orders():
-    return render_template('admin/portfolio_list.html')
+    return render_template('admin/orders.html')
 
 @app.route('/admin/portfolio/new', methods=['GET', 'POST'])
 @app.route('/admin/portfolio/edit/<int:project_id>', methods=['GET', 'POST'])
@@ -581,7 +611,7 @@ def admin_portfolio_form(project_id=None):
                     # Опционально: удалить старое изображение
                     old_image = p.get('image')
                     if old_image and old_image != image_filename:
-                        old_path = os.path.join(app.root_path, 'static', 'media', old_image)
+                        old_path = os.path.join(app.root_path, 'static', 'content', old_image)
                         if os.path.exists(old_path):
                             os.remove(old_path)
 
@@ -843,6 +873,53 @@ def pally_chargeback_webhook():
     except Exception as e:
         print("Ошибка вебхука чарджбэка:", e)
         return jsonify({"error": "Internal error"}), 500
+    
+@app.route('/download/<file_type>')
+def download_file(file_type):
+    files = {
+        'catalog': 'data/catalog.json',
+        'portfolio': 'data/portfolio.json',
+        'articles': 'data/articles.json',
+        'messages': 'data/messages.json'
+    }
+    
+    if file_type not in files:
+        abort(404)
+    
+    file_path = files[file_type]
+    
+    if not os.path.exists(file_path):
+        abort(404)
+    
+    filename = f"{file_type}.json"
+    
+    return send_file(
+        file_path,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/json'
+    )
+
+@app.route('/admin/download/content')
+@login_required
+def download_content():
+    """Скачивание папки content в zip-формате"""
+    zip_buffer = create_content_zip()
+    
+    if not zip_buffer:
+        flash("Папка content не найдена", "error")
+        return redirect(url_for('admin_dashboard'))
+    
+    # Генерируем имя файла с датой
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"content_backup_{timestamp}.zip"
+    
+    return send_file(
+        zip_buffer,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/zip'
+    )
 
 if __name__ == '__main__':
     app.run()

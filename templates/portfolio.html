@@ -16,7 +16,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for project in projects %}
             <div class="group relative overflow-hidden rounded-2xl glass tilt" data-tilt>
-                <img src="{{ url_for('static', filename='media/' + project.image) }}"
+                <img src="{{ url_for('static', filename='content/' + project.image) }}"
                      alt="{{ project.title }}"
                      class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
 

@@ -8,5 +8,15 @@
     "material": "PLA",
     "time": "2 дня",
     "price": 2500
+  },
+  {
+    "id": 2,
+    "name": "123",
+    "description": "123",
+    "category": "123123",
+    "material": "213",
+    "time": "132",
+    "price": 123,
+    "image": "work_f242eb7127de4799956cbf6e16bd5950.webp"
   }
 ]
