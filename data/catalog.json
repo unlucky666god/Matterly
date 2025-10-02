@@ -1,14 +1,38 @@
 [
   {
     "id": 1,
-    "name": "123123123",
-    "description": "123",
-    "category": "123",
-    "material": "123",
-    "time": "123",
-    "uid": "LET",
-    "count": "132",
-    "price": 123,
-    "image": "work_b334e6238148403ab56c4db46b51208d.webp"
+    "name": "Заглушка заднего бампера Toyota Hilux",
+    "description": "Заглушка для заднего бампера (рамы) автомобиля Toyota Hilux. 112Х64. ",
+    "category": "Автозапчасти",
+    "material": "PEDG",
+    "time": "2,5 часа",
+    "uid": "none",
+    "count": "none",
+    "price": 511,
+    "image": "work_7f5140f003d645479b956f1191022a31.webp"
+  },
+  {
+    "id": 2,
+    "name": "Крышка дворника стеклоочистителя Toyota Yaris, Corolla, Verso",
+    "description": "Крышка дворника стеклоочистителя Toyota Yaris 2005, Toyota Corolla 2004, Toyota Verso 2010. Диаметр 19,8мм. ",
+    "category": "Автозапчасти",
+    "material": "PEDG",
+    "time": "20 мин",
+    "uid": "none",
+    "count": "none",
+    "price": 49,
+    "image": "work_a35c82cdbf834b5f9a9292953f302148.webp"
+  },
+  {
+    "id": 3,
+    "name": "Центральная Крышка Колеса Toyota Prius",
+    "description": "Центральная Крышка Колеса Toyota Prius. 62/55мм. ",
+    "category": "Автозапчасти",
+    "material": "PEDG",
+    "time": "1,5 часа",
+    "uid": "none",
+    "count": "none",
+    "price": 281,
+    "image": "work_d06d9c78ea0e4df283ad1600d9aeb11c.webp"
   }
 ]
