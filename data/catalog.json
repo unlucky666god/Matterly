@@ -1,22 +1,14 @@
 [
   {
     "id": 1,
-    "name": "Замена детали для станка",
-    "category": "промышленность",
-    "description": "Печать функциональной запчасти из PLA",
-    "image": "work1.jpg",
-    "material": "PLA",
-    "time": "2 дня",
-    "price": 2500
-  },
-  {
-    "id": 2,
-    "name": "123",
+    "name": "123123123",
     "description": "123",
-    "category": "123123",
-    "material": "213",
-    "time": "132",
+    "category": "123",
+    "material": "123",
+    "time": "123",
+    "uid": "LET",
+    "count": "132",
     "price": 123,
-    "image": "work_f242eb7127de4799956cbf6e16bd5950.webp"
+    "image": "work_b334e6238148403ab56c4db46b51208d.webp"
   }
 ]

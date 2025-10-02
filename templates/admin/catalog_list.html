@@ -22,7 +22,7 @@
     <div class="glass p-4 rounded-lg flex justify-between items-center">
         <div>
             <h3 class="font-bold">{{ item.name }}</h3>
-            <p class="text-sm text-gray-400">{{ item.category }} • {{ item.price }} ₽</p>
+            <p class="text-sm text-gray-400">{{ item.category }} • {{ item.price }} ₽ • {{ item.uid }} • {{ item.count }}</p>
         </div>
         <div class="flex gap-2">
             <a href="{{ url_for('admin_catalog_form', item_id=item.id) }}"

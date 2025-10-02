@@ -30,6 +30,45 @@ ADMIN_PASSWORD = '147852369'  # ← ОБЯЗАТЕЛЬНО измените!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+def load_data(filename, default_data=None):
+    """Универсальная функция для загрузки данных из JSON файлов"""
+    if default_data is None:
+        default_data = []
+    
+    filepath = os.path.join(app.root_path, 'data', filename)
+    
+    # Создаём директорию, если её нет
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    
+    # Если файла нет или он пустой — создаём/пересоздаём
+    if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(default_data, f, ensure_ascii=False, indent=2)
+        return default_data
+    
+    # Пытаемся прочитать существующий файл
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        # Если файл повреждён — пересоздаём
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(default_data, f, ensure_ascii=False, indent=2)
+        return default_data
+
+# Теперь все функции становятся очень простыми:
+def load_catalog():
+    return load_data('catalog.json', [])
+
+def load_portfolio():
+    return load_data('portfolio.json', [])
+
+def load_articles():
+    return load_data('articles.json', [])
+
+def load_messages():
+    return load_data('messages.json', [])
+
 def verify_pally_signature(payload: bytes, signature: str) -> bool:
     """Проверяет подпись вебхука от Pally (если используется HMAC)"""
     expected = hmac.new(
@@ -39,37 +78,6 @@ def verify_pally_signature(payload: bytes, signature: str) -> bool:
     ).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
 
-def load_catalog():
-    with open(os.path.join(app.root_path, 'data', 'catalog.json'), 'r', encoding='utf-8') as f:
-        return json.load(f)
-    
-def load_portfolio():
-    with open(os.path.join(app.root_path, 'data', 'portfolio.json'), 'r', encoding='utf-8') as f:
-        return json.load(f)
-    
-def load_articles():
-    with open(os.path.join(app.root_path, 'data', 'articles.json'), 'r', encoding='utf-8') as f:
-        return json.load(f)
-    
-def load_messages():
-    filepath = os.path.join(app.root_path, 'data', 'messages.json')
-    
-    # Если файл не существует — возвращаем пустой список
-    if not os.path.exists(filepath):
-        return []
-    
-    # Если файл существует, но пустой — тоже возвращаем пустой список
-    if os.path.getsize(filepath) == 0:
-        return []
-    
-    # Иначе читаем как JSON
-    with open(filepath, 'r', encoding='utf-8') as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError:
-            # На случай, если файл повреждён — возвращаем пустой список
-            return []
-
 def save_messages(messages):
     filepath = os.path.join(app.root_path, 'data', 'messages.json')
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -77,14 +85,14 @@ def save_messages(messages):
         json.dump(messages, f, ensure_ascii=False, indent=4)
     
 def get_item_by_id(item_id):
+    """Находит товар по ID в каталоге"""
     try:
-        item_id = int(item_id)
         items = load_catalog()
         for item in items:
-            if item.get('id') == item_id:
+            if item.get('id') == int(item_id):
                 return item
-    except (ValueError, TypeError):
-        pass
+    except (ValueError, TypeError, KeyError) as e:
+        print(f"Ошибка при поиске товара {item_id}: {e}")
     return None
 
 def save_order(data):
@@ -471,62 +479,98 @@ def admin_catalog_form(item_id=None):
             return "Товар не найден", 404
 
     if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
-        category = request.form['category']
-        material = request.form['material']
-        time = request.form['time']
-        price = request.form.get('price')
-        price = int(price) if price and price.isdigit() else None
+        try:
+            # Получаем данные из формы
+            name = request.form.get('name', '').strip()
+            description = request.form.get('description', '').strip()
+            category = request.form.get('category', '').strip()
+            material = request.form.get('material', '').strip()
+            time = request.form.get('time', '').strip()
+            count = request.form.get('count', '').strip()
+            uid = request.form.get('uid', '').strip()  # Обрабатываем как опциональное поле
+            
+            # Обработка цены
+            price_str = request.form.get('price', '').strip()
+            price = None
+            if price_str:
+                try:
+                    price = int(price_str)
+                except ValueError:
+                    # Если цена не число, оставляем None
+                    pass
 
-        # Обработка изображения
-        image_file = request.files.get('image')
-        image_filename = None
+            # Валидация обязательных полей
+            if not name or not description or not category:
+                return "Заполните обязательные поля: название, описание, категория", 400
 
-        if image_file and image_file.filename:
-            image_filename = save_image_as_webp(image_file)
-            if not image_filename:
-                return "Недопустимый формат изображения", 400
-        elif item_id and item:
-            # При редактировании — оставляем старое изображение
-            image_filename = item['image']
-        else:
-            return "Изображение обязательно", 400
+            # Обработка изображения
+            image_file = request.files.get('image')
+            image_filename = None
 
-        items = load_catalog()
+            if image_file and image_file.filename:
+                image_filename = save_image_as_webp(image_file)
+                if not image_filename:
+                    return "Недопустимый формат изображения", 400
+            elif item_id and item:
+                # При редактировании — оставляем старое изображение
+                image_filename = item.get('image')
+            else:
+                return "Изображение обязательно", 400
 
-        if item_id:
-            for i, it in enumerate(items):
-                if it['id'] == item_id:
-                    items[i] = {
-                        "id": item_id,
-                        "name": name,
-                        "description": description,
-                        "category": category,
-                        "material": material,
-                        "time": time,
-                        "price": price,
-                        "image": image_filename
-                    }
-                    break
-        else:
-            new_id = max([it['id'] for it in items], default=0) + 1
-            items.append({
-                "id": new_id,
-                "name": name,
-                "description": description,
-                "category": category,
-                "material": material,
-                "time": time,
-                "price": price,
-                "image": image_filename
-            })
+            # Загружаем текущий каталог
+            items = load_catalog()
 
-        with open(os.path.join(app.root_path, 'data', 'catalog.json'), 'w', encoding='utf-8') as f:
-            json.dump(items, f, ensure_ascii=False, indent=2)
+            if item_id:
+                # Редактирование существующего товара
+                for i, it in enumerate(items):
+                    if it.get('id') == item_id:
+                        # Удаляем старое изображение, если загружено новое
+                        old_image = it.get('image')
+                        if old_image and old_image != image_filename:
+                            old_path = os.path.join(app.root_path, 'static', 'content', old_image)
+                            if os.path.exists(old_path):
+                                os.remove(old_path)
+                        
+                        items[i] = {
+                            "id": item_id,
+                            "name": name,
+                            "description": description,
+                            "category": category,
+                            "material": material,
+                            "time": time,
+                            "uid": uid,  # Сохраняем uid
+                            "count": count,
+                            "price": price,
+                            "image": image_filename
+                        }
+                        break
+            else:
+                # Создание нового товара
+                new_id = max([it.get('id', 0) for it in items], default=0) + 1
+                items.append({
+                    "id": new_id,
+                    "name": name,
+                    "description": description,
+                    "category": category,
+                    "material": material,
+                    "time": time,
+                    "uid": uid,  # Сохраняем uid
+                    "count": count,
+                    "price": price,
+                    "image": image_filename
+                })
 
-        return redirect(url_for('admin_catalog'))
+            # Сохраняем каталог
+            with open(os.path.join(app.root_path, 'data', 'catalog.json'), 'w', encoding='utf-8') as f:
+                json.dump(items, f, ensure_ascii=False, indent=2)
 
+            return redirect(url_for('admin_catalog'))
+
+        except Exception as e:
+            print(f"Ошибка при сохранении товара: {e}")
+            return f"Произошла ошибка при сохранении: {e}", 500
+
+    # GET запрос - отображаем форму
     return render_template('admin/catalog_form.html', item=item)
 
 @app.route('/admin/catalog/delete/<int:item_id>', methods=['POST'])
@@ -922,4 +966,4 @@ def download_content():
     )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
