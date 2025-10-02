@@ -8,8 +8,13 @@ from functools import wraps
 from PIL import Image
 import uuid
 import requests
+import hmac
+import hashlib
 
 app = Flask(__name__)
+
+# Секретный ключ для подписи вебхуков (получишь в личном кабинете Pally)
+PALLY_WEBHOOK_SECRET = "your_webhook_secret_here"  # ← ЗАМЕНИ НА РЕАЛЬНЫЙ!
 
 # Настройки PayPallych
 PALLY_MERCHANT_ID = "ваш_merchant_id"  # ← получите в личном кабинете pally.info
@@ -21,6 +26,15 @@ ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = '147852369'  # ← ОБЯЗАТЕЛЬНО измените!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def verify_pally_signature(payload: bytes, signature: str) -> bool:
+    """Проверяет подпись вебхука от Pally (если используется HMAC)"""
+    expected = hmac.new(
+        PALLY_WEBHOOK_SECRET.encode('utf-8'),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(f"sha256={expected}", signature)
 
 def load_catalog():
     with open(os.path.join(app.root_path, 'data', 'catalog.json'), 'r', encoding='utf-8') as f:
@@ -276,7 +290,7 @@ def portfolio():
 def payment_success():
     order_id = request.args.get('order_id')
     if not order_id:
-        return render_template('payment_fail.html', reason="Нет ID заказа")
+        return render_template('payment_success.html', reason="Нет ID заказа")
 
     # Обновляем статус заказа на "paid"
     filepath = os.path.join(app.root_path, 'data', 'orders.json')
@@ -723,6 +737,112 @@ def submit_form():
     else:
         flash('Проверка безопасности не пройдена. Попробуйте ещё раз.', 'error')
         return redirect(url_for('contacts'))
+
+@app.route('/payment', methods=['POST'])
+def pally_payment_webhook():
+    # Получаем raw тело запроса (для проверки подписи)
+    payload = request.get_data()
+    
+    # Проверка подписи (если поддерживается)
+    signature = request.headers.get('X-Signature')  # ← уточни имя заголовка в документации Pally
+    if PALLY_WEBHOOK_SECRET and signature:
+        if not verify_pally_signature(payload, signature):
+            return jsonify({"error": "Invalid signature"}), 400
+
+    try:
+        data = request.get_json()
+        order_id = data.get('order_id') or data.get('orderId')  # ← уточни структуру в документации
+        status = data.get('status')
+
+        if not order_id:
+            return jsonify({"error": "No order_id"}), 400
+
+        # Обновляем заказ на "paid"
+        filepath = os.path.join(app.root_path, 'data', 'orders.json')
+        if os.path.exists(filepath):
+            with open(filepath, 'r+', encoding='utf-8') as f:
+                orders = json.load(f)
+                for order in orders:
+                    if order.get('order_id') == order_id:
+                        order['status'] = 'paid'
+                        order['paid_at'] = datetime.now().isoformat()
+                        order['pally_data'] = data  # опционально: сохранить данные от Pally
+                        break
+                f.seek(0)
+                json.dump(orders, f, ensure_ascii=False, indent=2)
+                f.truncate()
+
+            # Отправка уведомления в Telegram
+            order_data = next((o for o in orders if o.get('order_id') == order_id), {})
+            send_order_notification(order_data)
+
+        return jsonify({"status": "ok"}), 200
+
+    except Exception as e:
+        print("Ошибка вебхука оплаты:", e)
+        return jsonify({"error": "Internal error"}), 500
+    
+@app.route('/payment/refund', methods=['POST'])
+def pally_refund_webhook():
+    payload = request.get_data()
+    signature = request.headers.get('X-Signature')
+    if PALLY_WEBHOOK_SECRET and signature:
+        if not verify_pally_signature(payload, signature):
+            return jsonify({"error": "Invalid signature"}), 400
+
+    try:
+        data = request.get_json()
+        order_id = data.get('order_id') or data.get('orderId')
+
+        if order_id:
+            filepath = os.path.join(app.root_path, 'data', 'orders.json')
+            if os.path.exists(filepath):
+                with open(filepath, 'r+', encoding='utf-8') as f:
+                    orders = json.load(f)
+                    for order in orders:
+                        if order.get('order_id') == order_id:
+                            order['status'] = 'refunded'
+                            order['refunded_at'] = datetime.now().isoformat()
+                            break
+                    f.seek(0)
+                    json.dump(orders, f, ensure_ascii=False, indent=2)
+                    f.truncate()
+
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        print("Ошибка вебхука возврата:", e)
+        return jsonify({"error": "Internal error"}), 500
+    
+@app.route('/payment/chargeback', methods=['POST'])
+def pally_chargeback_webhook():
+    payload = request.get_data()
+    signature = request.headers.get('X-Signature')
+    if PALLY_WEBHOOK_SECRET and signature:
+        if not verify_pally_signature(payload, signature):
+            return jsonify({"error": "Invalid signature"}), 400
+
+    try:
+        data = request.get_json()
+        order_id = data.get('order_id') or data.get('orderId')
+
+        if order_id:
+            filepath = os.path.join(app.root_path, 'data', 'orders.json')
+            if os.path.exists(filepath):
+                with open(filepath, 'r+', encoding='utf-8') as f:
+                    orders = json.load(f)
+                    for order in orders:
+                        if order.get('order_id') == order_id:
+                            order['status'] = 'chargeback'
+                            order['chargeback_at'] = datetime.now().isoformat()
+                            break
+                    f.seek(0)
+                    json.dump(orders, f, ensure_ascii=False, indent=2)
+                    f.truncate()
+
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        print("Ошибка вебхука чарджбэка:", e)
+        return jsonify({"error": "Internal error"}), 500
 
 if __name__ == '__main__':
     app.run()
