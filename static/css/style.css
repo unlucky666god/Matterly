@@ -1,6 +1,6 @@
 * {
-    -webkit-print-color-adjust: exact !important;
-    color-adjust: exact !important;
+    --webkit-print-color-adjust: exact !important;
+    -color-adjust: exact !important;
 }
 
 body {
@@ -142,11 +142,15 @@ body::after {
     /* Добавь это обязательно */
     html {
         -webkit-overflow-scrolling: touch;
-        overflow-scrolling: touch;
+        -overflow-scrolling: touch;
     }
 
     body {
         overscroll-behavior-y: none;
+    }
+
+    .stars, .star-background, [class*="star"] {
+        display: none !important;
     }
 }
 
@@ -163,11 +167,15 @@ body::after {
     /* Добавь это обязательно */
     html {
         -webkit-overflow-scrolling: touch;
-        overflow-scrolling: touch;
+        -overflow-scrolling: touch;
     }
 
     body {
         overscroll-behavior-y: none;
+    }
+
+        .stars, .star-background, [class*="star"] {
+        display: none !important;
     }
 }
 
