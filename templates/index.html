@@ -13,9 +13,16 @@
     <div class="absolute inset-0 bg-dark-900 z-[-1]"></div>
 
     <div id="hero-3d" class="absolute inset-0 z-0">
-        <!--<div id="hero-shape" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80"></div>-->
-        <video lazy autoplay muted loop playsinline class="hero-video" aria-hidden="true">
+        <!-- Десктоп видео -->
+        <video id="desktop-video" autoplay muted loop playsinline preload="metadata" poster="/static/video/poster.jpg"
+            class="hero-video hidden md:block" aria-hidden="true">
             <source src="{{ url_for('static', filename='media/background.mp4') }}" type="video/mp4">
+        </video>
+
+        <!-- Мобильное видео -->
+        <video id="mobile-video" autoplay muted loop playsinline preload="metadata" poster="/static/video/poster.jpg"
+            class="hero-video block md:hidden" aria-hidden="true">
+            <source src="{{ url_for('static', filename='media/backgroundLQ.mp4') }}" type="video/mp4">
         </video>
     </div>
     <div class="relative z-10 text-center px-4 max-w-4xl">
