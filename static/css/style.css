@@ -130,16 +130,44 @@ body::after {
 }
 
 @media (min-width: 768px) {
+    * {
+        overflow: hidden;
+    }
+
     #hero-shape {
         width: 400px;
         height: 400px;
     }
+
+    /* Добавь это обязательно */
+    html {
+        -webkit-overflow-scrolling: touch;
+        overflow-scrolling: touch;
+    }
+
+    body {
+        overscroll-behavior-y: none;
+    }
 }
 
 @media (min-width: 1024px) {
+    * {
+        overflow: hidden;
+    }
+
     #hero-shape {
         width: 500px;
         height: 500px;
+    }
+
+    /* Добавь это обязательно */
+    html {
+        -webkit-overflow-scrolling: touch;
+        overflow-scrolling: touch;
+    }
+
+    body {
+        overscroll-behavior-y: none;
     }
 }
 
