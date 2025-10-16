@@ -50,3 +50,83 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.addEventListener('click', closeMenuHandler);
     mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenuHandler));
 });
+
+// Функции для модального окна индивидуального заказа
+function openCustomOrderModal() {
+    document.getElementById('customOrderModal').style.display = 'block';
+}
+
+function closeCustomOrderModal() {
+    document.getElementById('customOrderModal').style.display = 'none';
+}
+
+// Закрытие модального окна при клике вне его
+window.onclick = function(event) {
+    const modal = document.getElementById('customOrderModal');
+    if (event.target === modal) {
+        closeCustomOrderModal();
+    }
+}
+
+// Обработка формы индивидуального заказа
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('customOrderForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitCustomOrder();
+        });
+    }
+});
+
+// Функция отправки индивидуального заказа
+async function submitCustomOrder() {
+    const form = document.getElementById('customOrderForm');
+    const formData = new FormData(form);
+
+    const orderData = {
+        fullName: formData.get('fullName'),
+        phone: formData.get('phone'),
+        email: formData.get('email'),
+        telegram: formData.get('telegram'),
+        orderDescription: formData.get('orderDescription')
+    };
+
+    try {
+        // Показываем индикатор загрузки
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Отправка...';
+        submitBtn.disabled = true;
+
+        // Отправляем данные на сервер
+        const response = await fetch('/api/custom-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        if (response.ok) {
+            // Показываем сообщение об успехе
+            alert('✅ Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+            form.reset();
+            closeCustomOrderModal();
+        } else {
+            throw new Error('Ошибка при отправке заявки');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз или свяжитесь с нами напрямую.');
+    } finally {
+        // Восстанавливаем кнопку
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.textContent = 'Отправить заявку';
+            submitBtn.disabled = false;
+        }
+    }
+}

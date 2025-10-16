@@ -965,5 +965,86 @@ def download_content():
         mimetype='application/zip'
     )
 
+# Добавьте этот маршрут в main.py после других API маршрутов
+@app.route('/api/custom-order', methods=['POST'])
+def custom_order():
+    try:
+        data = request.get_json()
+        
+        # Валидация обязательных полей
+        required_fields = ['fullName', 'phone', 'email', 'orderDescription']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"error": f"Поле {field} обязательно"}), 400
+
+        # Сохраняем заказ
+        order_id = str(uuid.uuid4())[:8]
+        order_data = {
+            "order_id": order_id,
+            "type": "custom_order",
+            "timestamp": datetime.now().isoformat(),
+            "status": "new",
+            "fullName": data['fullName'],
+            "phone": data['phone'],
+            "email": data['email'],
+            "telegram": data.get('telegram', ''),
+            "orderDescription": data['orderDescription']
+        }
+
+        # Сохраняем в JSON файл
+        orders_file = os.path.join(app.root_path, 'data', 'custom_orders.json')
+        os.makedirs(os.path.dirname(orders_file), exist_ok=True)
+        
+        if os.path.exists(orders_file):
+            with open(orders_file, 'r', encoding='utf-8') as f:
+                orders = json.load(f)
+        else:
+            orders = []
+            
+        orders.append(order_data)
+        
+        with open(orders_file, 'w', encoding='utf-8') as f:
+            json.dump(orders, f, ensure_ascii=False, indent=2)
+
+        # Отправляем уведомление в Telegram
+        from systemBot import send_custom_order_notification
+        telegram_sent = send_custom_order_notification(order_data)
+        
+        if telegram_sent:
+            print(f"✅ Уведомление о индивидуальном заказе {order_id} отправлено в Telegram")
+        else:
+            print(f"⚠️ Не удалось отправить уведомление о заказе {order_id} в Telegram")
+
+        return jsonify({"status": "success", "order_id": order_id})
+
+    except Exception as e:
+        print(f"❌ Ошибка при обработке индивидуального заказа: {e}")
+        return jsonify({"error": "Внутренняя ошибка сервера"}), 500
+
+# Добавьте маршрут для админ-панели чтобы видеть индивидуальные заказы
+@app.route('/admin/custom-orders')
+@login_required
+def admin_custom_orders():
+    orders_file = os.path.join(app.root_path, 'data', 'custom_orders.json')
+    orders = []
+    if os.path.exists(orders_file):
+        with open(orders_file, 'r', encoding='utf-8') as f:
+            orders = json.load(f)
+    # Сортируем по дате (новые сначала)
+    orders.sort(key=lambda x: x['timestamp'], reverse=True)
+    return render_template('admin/custom_orders.html', orders=orders)
+
+@app.route('/admin/custom-orders/delete/<string:order_id>', methods=['POST'])
+@login_required
+def admin_custom_order_delete(order_id):
+    orders_file = os.path.join(app.root_path, 'data', 'custom_orders.json')
+    if os.path.exists(orders_file):
+        with open(orders_file, 'r', encoding='utf-8') as f:
+            orders = json.load(f)
+        orders = [o for o in orders if o.get('order_id') != order_id]
+        with open(orders_file, 'w', encoding='utf-8') as f:
+            json.dump(orders, f, ensure_ascii=False, indent=2)
+    return redirect(url_for('admin_custom_orders'))
+
 if __name__ == '__main__':
     app.run(debug=True)

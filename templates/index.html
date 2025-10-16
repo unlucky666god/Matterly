@@ -110,6 +110,131 @@
     </div>
 </section>
 
+<!-- Индивидуальный заказ -->
+<section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="glass p-8 md:p-12 rounded-2xl text-center">
+            <h2 class="text-3xl font-bold mb-4 text-text-primary">Не нашли нужный товар?</h2>
+            <p class="text-xl text-text-secondary mb-6">Мы изготовим изделие специально для вас по вашим требованиям!
+            </p>
+
+            <!-- Преимущества -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 max-w-2xl mx-auto">
+                <div class="flex items-center justify-center">
+                    <span class="text-accent mr-3">✓</span>
+                    <span class="text-text-secondary">Бесплатная консультация</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <span class="text-accent mr-3">✓</span>
+                    <span class="text-text-secondary">Расчет стоимости за 1 час</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <span class="text-accent mr-3">✓</span>
+                    <span class="text-text-secondary">Любая сложность</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <span class="text-accent mr-3">✓</span>
+                    <span class="text-text-secondary">Гарантия качества</span>
+                </div>
+            </div>
+
+            <button onclick="openCustomOrderModal()"
+                class="px-8 py-4 bg-accent text-dark-900 font-bold rounded-full hover:bg-opacity-90 transition transform hover:scale-105">
+                Заказать индивидуальное изделие
+            </button>
+
+            <div class="mt-4 text-center text-sm text-text-secondary">
+                <p>⭐ Ежедневно выполняем 10+ индивидуальных заказов</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Модальное окно для заказа -->
+<div id="customOrderModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="glass rounded-2xl max-w-md w-full mx-auto border border-white/10 shadow-2xl">
+        <!-- Заголовок -->
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-text-primary flex items-center">
+                    <span class="text-accent mr-2">🎯</span>
+                    Индивидуальный заказ
+                </h2>
+                <button onclick="closeCustomOrderModal()" 
+                        class="text-text-secondary hover:text-accent transition text-2xl w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5">
+                    &times;
+                </button>
+            </div>
+            <p class="text-text-secondary mt-2 text-sm">Опишите задачу — свяжемся в течение 30 минут</p>
+        </div>
+
+        <!-- Форма -->
+        <form id="customOrderForm" class="p-6 space-y-4">
+            <!-- ФИО -->
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-text-primary mb-2">ФИО *</label>
+                <input type="text" id="fullName" name="fullName" required
+                    class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                    placeholder="Иванов Иван Иванович">
+            </div>
+
+            <!-- Телефон -->
+            <div>
+                <label for="phone" class="block text-sm font-medium text-text-primary mb-2">Телефон *</label>
+                <input type="tel" id="phone" name="phone" required
+                    class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                    placeholder="+7 (999) 999-99-99">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-text-primary mb-2">Email *</label>
+                <input type="email" id="email" name="email" required
+                    class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                    placeholder="your@email.com">
+            </div>
+
+            <!-- Telegram -->
+            <div>
+                <label for="telegram" class="block text-sm font-medium text-text-primary mb-2">Telegram</label>
+                <input type="text" id="telegram" name="telegram"
+                    class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                    placeholder="@username">
+            </div>
+
+            <!-- Описание заказа -->
+            <div>
+                <label for="orderDescription" class="block text-sm font-medium text-text-primary mb-2">Описание заказа *</label>
+                <textarea id="orderDescription" name="orderDescription" rows="4" required
+                    class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition resize-none"
+                    placeholder="Опишите подробно, что вам нужно изготовить..."></textarea>
+            </div>
+
+            <!-- Преимущества -->
+            <div class="grid grid-cols-2 gap-2 pt-2 text-xs">
+                <div class="flex items-center text-text-secondary">
+                    <span class="text-accent mr-1">✓</span> Бесплатная консультация
+                </div>
+                <div class="flex items-center text-text-secondary">
+                    <span class="text-accent mr-1">✓</span> Расчет за 1 час
+                </div>
+                <div class="flex items-center text-text-secondary">
+                    <span class="text-accent mr-1">✓</span> Любая сложность
+                </div>
+                <div class="flex items-center text-text-secondary">
+                    <span class="text-accent mr-1">✓</span> Гарантия качества
+                </div>
+            </div>
+
+            <!-- Кнопка отправки -->
+            <button type="submit" 
+                    class="w-full py-4 bg-accent text-dark-900 font-bold rounded-xl hover:bg-opacity-90 transition transform hover:scale-105 shadow-lg hover:shadow-accent/30 mt-4">
+                Отправить заявку
+            </button>
+        </form>
+    </div>
+</div>
+
 <!-- Галерея -->
 <section class="py-20 px-4">
     <h2 class="text-3xl font-bold text-center mb-16 text-text-primary">Наши работы</h2>

@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 # Конфигурация
-TELEGRAM_BOT_TOKEN = '8358424184:AAHcNrs2yBGMv9hMBh-dQZTQ3wzD4hFr4YQ'
+TELEGRAM_BOT_TOKEN = '8468371879:AAEvloU6H47kNyV3OyVeUKX2zYz5HG_T4zo'
 TELEGRAM_CHAT_IDS = ['839519148', '1448610598']  # Может быть несколько chat_id
 
 # Инициализация бота
@@ -79,4 +79,44 @@ def send_order_notification(order_data):
         
     except Exception as e:
         print(f"❌ Общая ошибка при отправке заказа: {e}")
+        return False
+    
+def send_custom_order_notification(order_data):
+    """Отправка уведомления о индивидуальном заказе"""
+    try:
+        timestamp = datetime.now().strftime("%d.%m.%Y %H:%M")
+        
+        # Формируем текст сообщения
+        text = f"""
+🎯 *НОВЫЙ ИНДИВИДУАЛЬНЫЙ ЗАКАЗ*
+
+*Заказ:* #{order_data.get('order_id', 'N/A')}
+*ФИО:* {order_data.get('fullName', 'Не указано')}
+*Телефон:* `{order_data.get('phone', 'Не указан')}`
+*Email:* `{order_data.get('email', 'Не указан')}`
+*Telegram:* {order_data.get('telegram', 'Не указан') or 'Не указан'}
+*Время:* {timestamp}
+
+*Описание заказа:*
+{order_data.get('orderDescription', 'Без описания')}
+        """.strip()
+
+        success_count = 0
+        for chat_id in TELEGRAM_CHAT_IDS:
+            try:
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    parse_mode='Markdown',
+                    disable_web_page_preview=True
+                )
+                success_count += 1
+                print(f"✅ Уведомление о индивидуальном заказе отправлено в чат {chat_id}")
+            except Exception as e:
+                print(f"❌ Ошибка отправки индивидуального заказа в {chat_id}: {e}")
+        
+        return success_count > 0
+        
+    except Exception as e:
+        print(f"❌ Общая ошибка при отправке индивидуального заказа: {e}")
         return False
