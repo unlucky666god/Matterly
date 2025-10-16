@@ -31,10 +31,10 @@
     <link rel="canonical" href="{{ request.url }}">
 
     <!-- Favicon и иконки -->
-    <link rel="preload" rel="apple-touch-icon" sizes="180x180"
+    <link rel="apple-touch-icon" sizes="180x180"
         href="{{ url_for('static', filename='favicon/favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
+    <link rel="icon" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon.ico') }}" type="image/png">
+    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon.ico') }}" type="image/png">
     <link rel="manifest" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     <link rel="mask-icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
@@ -212,12 +212,12 @@
             <p class="text-text-secondary mb-4">Created by Gamma</p>
             <div class="flex justify-center space-x-6">
                 <!-- ВКонтакте -->
-                <a href="#" class="text-text-secondary hover:text-accent transition duration-300">
+                <a href="https://vk.com/MatterlyRU" class="text-text-secondary hover:text-accent transition duration-300">
                     <img src="/static/img/vk.png" alt="ВКонтакте" class="w-6 h-6">
                 </a>
 
                 <!-- Telegram -->
-                <a href="#" class="text-text-secondary hover:text-accent transition duration-300">
+                <a href="https://t.me/matterlyru" class="text-text-secondary hover:text-accent transition duration-300">
                     <img src="/static/img/tg.png" alt="Telegram" class="w-6 h-6">
                 </a>
 
