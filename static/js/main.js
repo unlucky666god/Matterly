@@ -53,20 +53,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Функции для модального окна индивидуального заказа
 function openCustomOrderModal() {
-    document.getElementById('customOrderModal').style.display = 'block';
+    const modal = document.getElementById('customOrderModal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    // Фокус на первое поле после анимации
+    setTimeout(() => {
+        const firstInput = modal.querySelector('input');
+        if (firstInput) firstInput.focus();
+    }, 300);
 }
 
 function closeCustomOrderModal() {
-    document.getElementById('customOrderModal').style.display = 'none';
+    const modal = document.getElementById('customOrderModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    
+    // Сбрасываем фокус для скрытия мобильной клавиатуры
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
 }
 
 // Закрытие модального окна при клике вне его
-window.onclick = function(event) {
+document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('customOrderModal');
-    if (event.target === modal) {
+    if (modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCustomOrderModal();
+            }
+        });
+    }
+});
+
+// Закрытие на Escape
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
         closeCustomOrderModal();
     }
-}
+});
+
+// Предотвращаем закрытие при клике на форму
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('customOrderForm');
+    if (form) {
+        form.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    }
+});
 
 // Обработка формы индивидуального заказа
 document.addEventListener('DOMContentLoaded', function() {
@@ -85,12 +121,31 @@ async function submitCustomOrder() {
     const form = document.getElementById('customOrderForm');
     const formData = new FormData(form);
 
+    // Валидация обязательных полей
+    const requiredFields = ['fullName', 'phone', 'email', 'orderDescription'];
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        const input = form.querySelector(`[name="${field}"]`);
+        if (!input.value.trim()) {
+            isValid = false;
+            input.classList.add('border-red-500');
+        } else {
+            input.classList.remove('border-red-500');
+        }
+    });
+
+    if (!isValid) {
+        alert('⚠️ Пожалуйста, заполните все обязательные поля');
+        return;
+    }
+
     const orderData = {
-        fullName: formData.get('fullName'),
-        phone: formData.get('phone'),
-        email: formData.get('email'),
-        telegram: formData.get('telegram'),
-        orderDescription: formData.get('orderDescription')
+        fullName: formData.get('fullName').trim(),
+        phone: formData.get('phone').trim(),
+        email: formData.get('email').trim(),
+        telegram: formData.get('telegram').trim(),
+        orderDescription: formData.get('orderDescription').trim()
     };
 
     try {
@@ -99,6 +154,7 @@ async function submitCustomOrder() {
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Отправка...';
         submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-70');
 
         // Отправляем данные на сервер
         const response = await fetch('/api/custom-order', {
@@ -110,23 +166,91 @@ async function submitCustomOrder() {
         });
 
         if (response.ok) {
-            // Показываем сообщение об успехе
-            alert('✅ Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+            // Показываем красивый toast вместо alert
+            showToast('✅ Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
             form.reset();
             closeCustomOrderModal();
         } else {
-            throw new Error('Ошибка при отправке заявки');
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Ошибка при отправке заявки');
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз или свяжитесь с нами напрямую.');
+        showToast('❌ Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз.', 'error');
     } finally {
         // Восстанавливаем кнопку
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
             submitBtn.textContent = 'Отправить заявку';
             submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-70');
         }
     }
 }
+
+// Функция для показа красивых уведомлений
+function showToast(message, type = 'info') {
+    // Создаем элемент тоста
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl backdrop-blur-sm border transition-all transform translate-x-0 opacity-100 ${
+        type === 'success' 
+            ? 'bg-green-500/10 border-green-500/20 text-green-400' 
+            : 'bg-red-500/10 border-red-500/20 text-red-400'
+    }`;
+    toast.textContent = message;
+    
+    // Добавляем в DOM
+    document.body.appendChild(toast);
+    
+    // Автоматическое скрытие через 5 секунд
+    setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 5000);
+    
+    // Закрытие по клику
+    toast.addEventListener('click', () => {
+        toast.style.transform = 'translateX(100%)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    });
+}
+
+// Оптимизация для мобильных устройств
+document.addEventListener('DOMContentLoaded', function() {
+    // Предотвращаем масштабирование при фокусе на iOS
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.fontSize = '16px'; // Предотвращает зум на iOS
+        });
+    });
+    
+    // Улучшаем обработку виртуальной клавиатуры
+    if ('visualViewport' in window) {
+        const visualViewport = window.visualViewport;
+        visualViewport.addEventListener('resize', function() {
+            // Корректируем позицию модального окна при появлении клавиатуры
+            const modal = document.getElementById('customOrderModal');
+            if (!modal.classList.contains('hidden')) {
+                modal.style.top = `${visualViewport.offsetTop}px`;
+                modal.style.height = `${visualViewport.height}px`;
+            }
+        });
+    }
+});
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Custom order modal initialized');
+});

@@ -336,3 +336,39 @@ body::after {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* Дополнительные стили для мобильной оптимизации */
+@media (max-width: 640px) {
+    /* Улучшаем скролл на iOS */
+    .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Предотвращаем zoom при фокусе на iOS */
+    @media (max-width: 480px) {
+        input, textarea {
+            font-size: 16px !important;
+        }
+    }
+}
+
+/* Улучшаем доступность для тач-устройств */
+button, input, textarea {
+    touch-action: manipulation;
+}
+
+/* Плавная анимация появления */
+#customOrderModal {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
