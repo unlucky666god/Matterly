@@ -183,7 +183,37 @@ def order_form():
     item = get_item_by_id(item_id)
     if not item:
         return "Товар не найден", 404
+    
+    # Если есть данные в GET-параметрах, обрабатываем заказ
+    if request.args.get('name') and request.args.get('email') and request.args.get('phone'):
+        try:
+            # Сохраняем заказ
+            order_id = save_order({
+                "item_id": item['id'],
+                "name": request.args.get('name'),
+                "email": request.args.get('email'),
+                "phone": request.args.get('phone'),
+                "comment": request.args.get('comment', ''),
+                "delivery_service": request.args.get('delivery_service', ''),
+                "delivery_address": request.args.get('delivery_address', ''),
+                "amount": item.get('price', 0),
+                "item_name": item['name']
+            })
+            
+            # Редирект на страницу успеха
+            return redirect(url_for('order_success', order_id=order_id))
+            
+        except Exception as e:
+            print(f"Ошибка при сохранении заказа: {e}")
+            # Если ошибка, показываем форму с сообщением об ошибке
+            return render_template('order.html', item=item, item_id=item['id'], error="Ошибка при оформлении заказа")
+    
     return render_template('order.html', item=item, item_id=item['id'])
+
+@app.route('/order/success')
+def order_success():
+    order_id = request.args.get('order_id')
+    return render_template('order_success.html', order_id=order_id)
 
 @app.route('/')
 def index():
@@ -361,67 +391,61 @@ def payment_fail():
     return render_template('payment_fail.html')
 
 @app.route('/api/create-payment', methods=['POST'])
-@app.route('/api/create-payment', methods=['POST'])
-def create_payment():
-    try:
-        data = request.get_json()
-        item_id = data.get('item_id')
-        item = get_item_by_id(item_id)
-        
-        if not item:
-            return jsonify({"error": "Товар не найден"}), 400
-        
-        # Проверяем обязательные поля доставки
-        if not data.get('delivery_service') or not data.get('delivery_address'):
-            return jsonify({"error": "Укажите службу доставки и адрес ПВЗ"}), 400
-        
-        # Проверяем, что цена указана
-        amount = item.get('price')
-        if not amount or amount <= 0:
-            # Если товар без цены, просто сохраняем заказ и отправляем уведомление
-            order_id = save_order({
-                "item_id": item['id'],
-                "name": data['name'],
-                "email": data['email'],
-                "phone": data['phone'],
-                "comment": data.get('comment', ''),
-                "delivery_service": data.get('delivery_service', ''),
-                "delivery_address": data.get('delivery_address', ''),
-                "amount": 0,
-                "item_name": item['name']
-            })
-            return jsonify({"status": "success", "order_id": order_id})
-        
-        # Для платных товаров создаем платежную ссылку
-        order_id = save_order({
-            "item_id": item['id'],
-            "name": data['name'],
-            "email": data['email'],
-            "phone": data['phone'],
-            "comment": data.get('comment', ''),
-            "delivery_service": data.get('delivery_service', ''),
-            "delivery_address": data.get('delivery_address', ''),
-            "amount": amount,
-            "item_name": item['name']
-        })
-
-        # Формируем описание (без спецсимволов)
-        description = item['name'].replace(' ', '+')
-
-        # Генерируем платёжную ссылку
-        payment_url = (
-            f"https://pay.pally.info/pay/{PALLY_MERCHANT_ID}"
-            f"?amount={amount}"
-            f"&description={description}"
-            f"&success_url={request.url_root}payment/success?order_id={order_id}"
-            f"&fail_url={request.url_root}payment/fail"
-        )
-
-        return jsonify({"payment_url": payment_url})
+def save_order(data):
+    filepath = os.path.join(app.root_path, 'data', 'orders.json')
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
     
+    order_id = str(uuid.uuid4())[:8]
+    order = {
+        "order_id": order_id,
+        "timestamp": datetime.now().isoformat(),
+        "status": "pending",
+        "item_id": data["item_id"],
+        "item_name": data["item_name"],
+        "amount": data["amount"],
+        "name": data["name"],
+        "email": data["email"],
+        "phone": data["phone"],
+        "comment": data.get("comment", ""),
+        "delivery_service": data.get("delivery_service", ""),
+        "delivery_address": data.get("delivery_address", "")
+    }
+    
+    print(f"📦 Сохранение заказа: {order_id}")
+    print(f"   Товар: {data['item_name']}")
+    print(f"   Клиент: {data['name']}")
+    print(f"   Доставка: {data.get('delivery_service', 'Не указана')}")
+    
+    if os.path.exists(filepath):
+        with open(filepath, 'r', encoding='utf-8') as f:
+            try:
+                orders = json.load(f)
+            except json.JSONDecodeError:
+                orders = []
+    else:
+        orders = []
+    
+    orders.append(order)
+    
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(orders, f, ensure_ascii=False, indent=2)
+        print(f"✅ Заказ {order_id} сохранен в JSON")
     except Exception as e:
-        print("Ошибка создания платежа:", e)
-        return jsonify({"error": "Не удалось создать платёж"}), 500
+        print(f"❌ Ошибка сохранения заказа в JSON: {e}")
+        return None
+    
+    # Отправляем уведомление в Telegram
+    try:
+        telegram_sent = send_order_notification(order)
+        if telegram_sent:
+            print(f"✅ Уведомление о заказе {order_id} отправлено в Telegram")
+        else:
+            print(f"⚠️ Не удалось отправить уведомление о заказе {order_id} в Telegram")
+    except Exception as e:
+        print(f"❌ Ошибка при отправке в Telegram: {e}")
+    
+    return order_id
     
 def login_required(f):
     @wraps(f)

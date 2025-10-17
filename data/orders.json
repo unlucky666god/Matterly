@@ -1,0 +1,16 @@
+[
+  {
+    "order_id": "b28cd130",
+    "timestamp": "2025-10-17T15:16:30.931536",
+    "status": "pending",
+    "item_id": 1,
+    "item_name": "Заглушка заднего бампера Toyota Hilux",
+    "amount": 511,
+    "name": "TEST TEST TEST",
+    "email": "test@test.test",
+    "phone": "+79999999999",
+    "comment": "123",
+    "delivery_service": "Почта России",
+    "delivery_address": "123123 123123"
+  }
+]
