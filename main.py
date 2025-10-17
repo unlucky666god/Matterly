@@ -660,11 +660,6 @@ def admin_portfolio():
     projects = load_portfolio()
     return render_template('admin/portfolio_list.html', projects=projects)
 
-@app.route('/admin/orders')
-@login_required
-def admin_orders():
-    return render_template('admin/orders.html')
-
 @app.route('/admin/portfolio/new', methods=['GET', 'POST'])
 @app.route('/admin/portfolio/edit/<int:project_id>', methods=['GET', 'POST'])
 @login_required
@@ -738,65 +733,66 @@ def admin_portfolio_form(project_id=None):
 
     return render_template('admin/portfolio_form.html', project=project)
 
+# Загрузка заказов
+def load_orders():
+    return load_data('orders.json', [])
+
+# Сохранение заказов
+def save_orders(orders):
+    filepath = os.path.join(app.root_path, 'data', 'orders.json')
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(orders, f, ensure_ascii=False, indent=2)
+
+# Маршрут для отображения заказов в админке
+@app.route('/admin/orders')
+@login_required
+def admin_orders():
+    orders = load_orders()
+    # Сортируем по дате (новые сначала)
+    orders.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    return render_template('admin/orders.html', orders=orders)
+
+# Маршрут для редактирования заказа
 @app.route('/admin/orders/edit/<string:order_id>', methods=['GET', 'POST'])
 @login_required
-def admin_order_form(order_id):
-    # Загружаем заказы
-    orders_path = os.path.join(app.root_path, 'data', 'orders.json')
-    if not os.path.exists(orders_path):
-        return "Заказ не найден", 404
-
-    with open(orders_path, 'r', encoding='utf-8') as f:
-        orders = json.load(f)
-
+def admin_order_edit(order_id):
+    orders = load_orders()
     order = next((o for o in orders if o.get('order_id') == order_id), None)
+    
     if not order:
-        return "Заказ не найден", 404
-
-    if request.method == 'POST':
-        # Обновляем только статус (остальное не редактируется)
-        new_status = request.form['status']
-        if new_status not in ['pending', 'paid', 'cancelled']:
-            new_status = 'pending'
-
-        for o in orders:
-            if o['order_id'] == order_id:
-                o['status'] = new_status
-                if new_status == 'paid' and 'paid_at' not in o:
-                    o['paid_at'] = datetime.now().isoformat()
-                break
-
-        # Сохраняем
-        with open(orders_path, 'w', encoding='utf-8') as f:
-            json.dump(orders, f, ensure_ascii=False, indent=2)
-
+        flash('Заказ не найден', 'error')
         return redirect(url_for('admin_orders'))
-
+    
+    if request.method == 'POST':
+        # Обновляем данные заказа
+        order['status'] = request.form.get('status', 'pending')
+        order['name'] = request.form.get('name', '')
+        order['email'] = request.form.get('email', '')
+        order['phone'] = request.form.get('phone', '')
+        order['delivery_service'] = request.form.get('delivery_service', '')
+        order['delivery_address'] = request.form.get('delivery_address', '')
+        order['comment'] = request.form.get('comment', '')
+        
+        # Если статус изменился на "paid" и нет даты оплаты - добавляем
+        if order['status'] == 'paid' and 'paid_at' not in order:
+            order['paid_at'] = datetime.now().isoformat()
+        
+        save_orders(orders)
+        flash('Заказ успешно обновлен', 'success')
+        return redirect(url_for('admin_orders'))
+    
     return render_template('admin/order_form.html', order=order)
 
-# Удаление портфолио
-@app.route('/admin/portfolio/delete/<int:project_id>', methods=['POST'])
-@login_required
-def admin_portfolio_delete(project_id):
-    projects = load_portfolio()
-    projects = [p for p in projects if p.get('id') != project_id]
-    with open(os.path.join(app.root_path, 'data', 'portfolio.json'), 'w', encoding='utf-8') as f:
-        json.dump(projects, f, ensure_ascii=False, indent=2)
-    return redirect(url_for('admin_portfolio'))
-
-# Удаление заказа
+# Маршрут для удаления заказа
 @app.route('/admin/orders/delete/<string:order_id>', methods=['POST'])
 @login_required
 def admin_order_delete(order_id):
-    orders_path = os.path.join(app.root_path, 'data', 'orders.json')
-    if os.path.exists(orders_path):
-        with open(orders_path, 'r', encoding='utf-8') as f:
-            orders = json.load(f)
-        orders = [o for o in orders if o.get('order_id') != order_id]
-        with open(orders_path, 'w', encoding='utf-8') as f:
-            json.dump(orders, f, ensure_ascii=False, indent=2)
+    orders = load_orders()
+    orders = [o for o in orders if o.get('order_id') != order_id]
+    save_orders(orders)
+    flash('Заказ удален', 'success')
     return redirect(url_for('admin_orders'))
-
 @app.route('/sitemap.xml')
 def sitemapXml():
     return render_template('sitemap.xml')
@@ -1097,4 +1093,4 @@ def admin_custom_order_delete(order_id):
     return redirect(url_for('admin_custom_orders'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=False)

@@ -1,45 +1,132 @@
 {% extends "admin/base.html" %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Заказы</h1>
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Заказы</h1>
+    <div class="text-sm text-gray-400">
+        Всего заказов: {{ orders|length }}
+    </div>
+</div>
 
+<!-- Фильтры -->
+<div class="glass p-4 rounded-xl mb-6">
+    <div class="flex flex-wrap gap-4 items-center">
+        <span class="text-text-primary font-medium">Фильтры:</span>
+        <a href="{{ url_for('admin_orders') }}" 
+           class="px-3 py-1 rounded-lg {% if not request.args.get('status') %}bg-accent text-dark-900{% else %}bg-gray-700 text-text-primary{% endif %}">
+            Все
+        </a>
+        <a href="{{ url_for('admin_orders', status='pending') }}" 
+           class="px-3 py-1 rounded-lg {% if request.args.get('status') == 'pending' %}bg-yellow-500/20 text-yellow-400{% else %}bg-gray-700 text-text-primary{% endif %}">
+            В ожидании
+        </a>
+        <a href="{{ url_for('admin_orders', status='paid') }}" 
+           class="px-3 py-1 rounded-lg {% if request.args.get('status') == 'paid' %}bg-green-500/20 text-green-400{% else %}bg-gray-700 text-text-primary{% endif %}">
+            Оплаченные
+        </a>
+        <a href="{{ url_for('admin_orders', status='cancelled') }}" 
+           class="px-3 py-1 rounded-lg {% if request.args.get('status') == 'cancelled' %}bg-red-500/20 text-red-400{% else %}bg-gray-700 text-text-primary{% endif %}">
+            Отмененные
+        </a>
+    </div>
+</div>
+
+<!-- Список заказов -->
 <div class="space-y-4">
-    {% for order in orders|reverse %}
-    <div class="glass p-5 rounded-lg border-l-4 {% if order.status == 'paid' %}border-green-500{% else %}border-yellow-500{% endif %}">
-        <div class="flex justify-between mb-2">
-            <span class="font-bold">Заказ #{{ order.order_id }}</span>
-            <span class="text-sm {% if order.status == 'paid' %}text-green-400{% else %}text-yellow-400{% endif %}">
-                {{ 'Оплачен' if order.status == 'paid' else 'В ожидании' }}
-            </span>
-        </div>
-        <p><strong>{{ order.item_name }}</strong> — {{ order.amount }} ₽</p>
-        <p class="text-gray-300">{{ order.name }} • {{ order.phone }} • {{ order.email }}</p>
-        
-        <!-- Добавляем информацию о доставке -->
-        <div class="mt-2 p-3 bg-gray-800 rounded-lg">
-            <p class="text-sm text-gray-300">
-                <strong>Доставка:</strong> {{ order.delivery_service }}
-            </p>
-            <p class="text-sm text-gray-300 mt-1">
-                <strong>ПВЗ:</strong> {{ order.delivery_address }}
-            </p>
+    {% for order in orders %}
+        {% if not request.args.get('status') or order.status == request.args.get('status') %}
+        <div class="glass p-6 rounded-xl border-l-4 
+            {% if order.status == 'paid' %}border-green-500
+            {% elif order.status == 'cancelled' %}border-red-500
+            {% else %}border-yellow-500{% endif %}">
+            
+            <!-- Заголовок заказа -->
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span class="font-bold text-lg">Заказ #{{ order.order_id }}</span>
+                    <span class="ml-3 text-sm px-2 py-1 rounded-full 
+                        {% if order.status == 'paid' %}bg-green-500/20 text-green-400
+                        {% elif order.status == 'cancelled' %}bg-red-500/20 text-red-400
+                        {% else %}bg-yellow-500/20 text-yellow-400{% endif %}">
+                        {% if order.status == 'paid' %}Оплачен
+                        {% elif order.status == 'cancelled' %}Отменен
+                        {% else %}В ожидании{% endif %}
+                    </span>
+                </div>
+                <span class="text-sm text-gray-500">{{ order.timestamp[:16].replace('T', ' ') }}</span>
+            </div>
+
+            <!-- Информация о товаре -->
+            <div class="mb-4">
+                <p class="text-text-primary">
+                    <strong>{{ order.item_name }}</strong> — {{ order.amount }} ₽
+                </p>
+                <p class="text-sm text-gray-400">ID товара: {{ order.item_id }}</p>
+            </div>
+
+            <!-- Контактная информация -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-400 mb-2">Контактные данные:</h3>
+                    <p class="text-text-primary">👤 {{ order.name }}</p>
+                    <p class="text-text-primary">📞 {{ order.phone }}</p>
+                    <p class="text-text-primary">📧 {{ order.email }}</p>
+                </div>
+                
+                <!-- Информация о доставке -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-400 mb-2">Доставка:</h3>
+                    <p class="text-text-primary">
+                        <strong>Служба:</strong> {{ order.delivery_service or 'Не указана' }}
+                    </p>
+                    <p class="text-text-primary">
+                        <strong>ПВЗ:</strong> {{ order.delivery_address or 'Не указан' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Комментарий -->
             {% if order.comment %}
-            <p class="text-sm text-gray-300 mt-1">
-                <strong>Комментарий:</strong> {{ order.comment }}
-            </p>
+            <div class="mb-4 p-3 bg-gray-800/50 rounded-lg">
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Комментарий клиента:</h3>
+                <p class="text-text-primary text-sm">{{ order.comment }}</p>
+            </div>
             {% endif %}
+
+            <!-- Дополнительная информация -->
+            <div class="flex justify-between items-center text-sm text-gray-500">
+                <div>
+                    {% if order.paid_at %}
+                    <span>Оплачен: {{ order.paid_at[:16].replace('T', ' ') }}</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Действия -->
+                <div class="flex space-x-2">
+                    <a href="{{ url_for('admin_order_edit', order_id=order.order_id) }}" 
+                       class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition">
+                        Редактировать
+                    </a>
+                    <form method="POST" 
+                          action="{{ url_for('admin_order_delete', order_id=order.order_id) }}" 
+                          onsubmit="return confirm('Удалить заказ #{{ order.order_id }}?')"
+                          class="inline">
+                        <button type="submit" 
+                                class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition">
+                            Удалить
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <p class="text-sm text-gray-500 mt-2">{{ order.timestamp[:10] }}</p>
-        {% if order.status != 'paid' %}
-        <form method="POST" action="{{ url_for('admin_order_delete', order_id=order.order_id) }}" class="inline mt-3"
-            onsubmit="return confirm('Удалить заказ?')">
-            <button type="submit" class="text-red-500 hover:underline text-sm">Удалить</button>
-        </form>
+        {% endif %}
+    {% else %}
+    <div class="glass p-8 rounded-xl text-center">
+        <p class="text-gray-500 text-lg">Заказов не найдено</p>
+        {% if request.args.get('status') %}
+        <p class="text-gray-400 mt-2">Попробуйте изменить фильтр</p>
         {% endif %}
     </div>
-    {% else %}
-    <p class="text-gray-500">Нет заказов</p>
     {% endfor %}
 </div>
 {% endblock %}
