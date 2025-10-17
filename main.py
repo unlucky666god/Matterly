@@ -109,7 +109,10 @@ def save_order(data):
         "amount": data["amount"],
         "name": data["name"],
         "email": data["email"],
-        "phone": data["phone"]
+        "phone": data["phone"],
+        "comment": data.get("comment", ""),
+        "delivery_service": data.get("delivery_service", ""),  # Добавляем службу доставки
+        "delivery_address": data.get("delivery_address", "")   # Добавляем адрес ПВЗ
     }
     
     if os.path.exists(filepath):
@@ -121,6 +124,9 @@ def save_order(data):
     orders.append(order)
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(orders, f, ensure_ascii=False, indent=2)
+    
+    # Отправляем уведомление в Telegram
+    send_order_notification(order)
     
     return order_id
 
@@ -355,6 +361,7 @@ def payment_fail():
     return render_template('payment_fail.html')
 
 @app.route('/api/create-payment', methods=['POST'])
+@app.route('/api/create-payment', methods=['POST'])
 def create_payment():
     try:
         data = request.get_json()
@@ -364,17 +371,36 @@ def create_payment():
         if not item:
             return jsonify({"error": "Товар не найден"}), 400
         
+        # Проверяем обязательные поля доставки
+        if not data.get('delivery_service') or not data.get('delivery_address'):
+            return jsonify({"error": "Укажите службу доставки и адрес ПВЗ"}), 400
+        
         # Проверяем, что цена указана
         amount = item.get('price')
         if not amount or amount <= 0:
-            return jsonify({"error": "Цена не указана или некорректна"}), 400
-
-        # Сохраняем заказ
+            # Если товар без цены, просто сохраняем заказ и отправляем уведомление
+            order_id = save_order({
+                "item_id": item['id'],
+                "name": data['name'],
+                "email": data['email'],
+                "phone": data['phone'],
+                "comment": data.get('comment', ''),
+                "delivery_service": data.get('delivery_service', ''),
+                "delivery_address": data.get('delivery_address', ''),
+                "amount": 0,
+                "item_name": item['name']
+            })
+            return jsonify({"status": "success", "order_id": order_id})
+        
+        # Для платных товаров создаем платежную ссылку
         order_id = save_order({
             "item_id": item['id'],
             "name": data['name'],
             "email": data['email'],
             "phone": data['phone'],
+            "comment": data.get('comment', ''),
+            "delivery_service": data.get('delivery_service', ''),
+            "delivery_address": data.get('delivery_address', ''),
             "amount": amount,
             "item_name": item['name']
         })
@@ -1047,4 +1073,4 @@ def admin_custom_order_delete(order_id):
     return redirect(url_for('admin_custom_orders'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

@@ -5,8 +5,7 @@
 
 <div class="space-y-4">
     {% for order in orders|reverse %}
-    <div
-        class="glass p-5 rounded-lg border-l-4 {% if order.status == 'paid' %}border-green-500{% else %}border-yellow-500{% endif %}">
+    <div class="glass p-5 rounded-lg border-l-4 {% if order.status == 'paid' %}border-green-500{% else %}border-yellow-500{% endif %}">
         <div class="flex justify-between mb-2">
             <span class="font-bold">Заказ #{{ order.order_id }}</span>
             <span class="text-sm {% if order.status == 'paid' %}text-green-400{% else %}text-yellow-400{% endif %}">
@@ -15,6 +14,22 @@
         </div>
         <p><strong>{{ order.item_name }}</strong> — {{ order.amount }} ₽</p>
         <p class="text-gray-300">{{ order.name }} • {{ order.phone }} • {{ order.email }}</p>
+        
+        <!-- Добавляем информацию о доставке -->
+        <div class="mt-2 p-3 bg-gray-800 rounded-lg">
+            <p class="text-sm text-gray-300">
+                <strong>Доставка:</strong> {{ order.delivery_service }}
+            </p>
+            <p class="text-sm text-gray-300 mt-1">
+                <strong>ПВЗ:</strong> {{ order.delivery_address }}
+            </p>
+            {% if order.comment %}
+            <p class="text-sm text-gray-300 mt-1">
+                <strong>Комментарий:</strong> {{ order.comment }}
+            </p>
+            {% endif %}
+        </div>
+        
         <p class="text-sm text-gray-500 mt-2">{{ order.timestamp[:10] }}</p>
         {% if order.status != 'paid' %}
         <form method="POST" action="{{ url_for('admin_order_delete', order_id=order.order_id) }}" class="inline mt-3"

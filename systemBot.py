@@ -120,3 +120,52 @@ def send_custom_order_notification(order_data):
     except Exception as e:
         print(f"❌ Общая ошибка при отправке индивидуального заказа: {e}")
         return False
+    
+def send_order_notification(order_data):
+    """Отправка уведомления о новом заказе"""
+    try:
+        timestamp = datetime.now().strftime("%d.%m.%Y %H:%M")
+        
+        # Формируем текст сообщения
+        text = f"""
+🛒 *НОВЫЙ ЗАКАЗ С САЙТА*
+
+*Заказ:* #{order_data.get('order_id', 'N/A')}
+*Товар:* {order_data.get('item_name', 'N/A')} (ID: {order_data.get('item_id', 'N/A')})
+*Сумма:* {order_data.get('amount', 0)} ₽
+
+*Клиент:*
+👤 {order_data.get('name', 'Не указано')}
+📞 `{order_data.get('phone', 'Не указан')}`
+📧 `{order_data.get('email', 'Не указан')}`
+
+*Доставка:*
+🚚 Служба: {order_data.get('delivery_service', 'Не указана')}
+📍 ПВЗ: {order_data.get('delivery_address', 'Не указан')}
+
+*Комментарий:*
+{order_data.get('comment', 'Без комментария')}
+
+*Время заказа:* {timestamp}
+*Статус:* {order_data.get('status', 'pending')}
+        """.strip()
+
+        success_count = 0
+        for chat_id in TELEGRAM_CHAT_IDS:
+            try:
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    parse_mode='Markdown',
+                    disable_web_page_preview=True
+                )
+                success_count += 1
+                print(f"✅ Уведомление о заказе отправлено в чат {chat_id}")
+            except Exception as e:
+                print(f"❌ Ошибка отправки заказа в {chat_id}: {e}")
+        
+        return success_count > 0
+        
+    except Exception as e:
+        print(f"❌ Общая ошибка при отправке заказа: {e}")
+        return False

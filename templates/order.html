@@ -1,70 +1,286 @@
-<!-- templates/order.html -->
 {% extends "base.html" %}
-{% block title %}Оформление заказа — {{ item.name }}{% endblock %}
+
+{% block title %}Оформление заказа — {{ item.name }} | Matterly{% endblock %}
 
 {% block content %}
 <section class="py-16 px-4">
-    <div class="max-w-lg mx-auto glass p-8 rounded-2xl">
-        <h1 class="text-2xl font-bold mb-6 text-text-primary">Оформление заказа</h1>
+    <div class="max-w-2xl mx-auto">
+        <!-- Хлебные крошки -->
+        <nav class="flex items-center space-x-2 text-sm text-text-secondary mb-8">
+            <a href="{{ url_for('catalog') }}" class="hover:text-accent transition">Каталог</a>
+            <span>/</span>
+            <a href="{{ url_for('catalog_item', item_id=item.id) }}" class="hover:text-accent transition">{{ item.name }}</a>
+            <span>/</span>
+            <span class="text-text-primary">Оформление заказа</span>
+        </nav>
 
-        <div class="mb-6 p-4 bg-gray-800/30 rounded-lg">
-            <h2 class="font-bold">{{ item.name }}</h2>
-            <p class="text-accent text-lg">
-                {% if item.price %}
-                {{ item.price }} ₽
-                {% else %}
-                По запросу
-                {% endif %}
-            </p>
+        <!-- Заголовок -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-text-primary mb-2">Оформление заказа</h1>
+            <p class="text-text-secondary">Заполните форму ниже для покупки товара</p>
         </div>
 
-        <form id="order-form">
-            <input type="hidden" name="item_id" value="{{ item_id }}">
+        <div class="grid gap-8">
+            <!-- Информация о товаре -->
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold text-text-primary mb-4">Ваш заказ</h2>
+                
+                <div class="flex items-center space-x-4 mb-4">
+                    <img src="{{ url_for('static', filename='content/' + item.image) }}" 
+                         alt="{{ item.name }}" 
+                         class="w-16 h-16 object-cover rounded-lg">
+                    <div>
+                        <h3 class="font-semibold text-text-primary">{{ item.name }}</h3>
+                        <p class="text-sm text-text-secondary">{{ item.category }}</p>
+                        <p class="text-accent font-bold text-lg">
+                            {% if item.price %}
+                                {{ item.price }} ₽
+                            {% else %}
+                                По запросу
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
 
-            <div class="mb-4">
-                <label class="block mb-1">Имя *</label>
-                <input type="text" name="name" required
-                    class="w-full p-3 bg-transparent border border-gray-600 rounded">
-            </div>
-            <div class="mb-4">
-                <label class="block mb-1">Email *</label>
-                <input type="email" name="email" required
-                    class="w-full p-3 bg-transparent border border-gray-600 rounded">
-            </div>
-            <div class="mb-6">
-                <label class="block mb-1">Телефон *</label>
-                <input type="tel" name="phone" required
-                    class="w-full p-3 bg-transparent border border-gray-600 rounded">
+                <div class="space-y-2 text-sm text-text-secondary">
+                    <div class="flex justify-between">
+                        <span>Материал:</span>
+                        <span class="text-text-primary">{{ item.material }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Срок изготовления:</span>
+                        <span class="text-text-primary">{{ item.time }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Доставка:</span>
+                        <span class="text-text-primary">до ПВЗ</span>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="w-full py-3 bg-accent text-dark-900 font-bold rounded">
-                Перейти к оплате
-            </button>
-        </form>
+            <!-- Форма заказа -->
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold text-text-primary mb-6">Данные для заказа</h2>
+                
+                <form id="orderForm" class="space-y-4">
+                    <!-- Скрытое поле с ID товара -->
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    
+                    <!-- ФИО -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-text-primary mb-2">
+                            ФИО *
+                        </label>
+                        <input type="text" 
+                               id="name" 
+                               name="name" 
+                               required
+                               class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                               placeholder="Иванов Иван Иванович">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-text-primary mb-2">
+                            Email *
+                        </label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               required
+                               class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                               placeholder="your@email.com">
+                    </div>
+
+                    <!-- Телефон -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-text-primary mb-2">
+                            Телефон *
+                        </label>
+                        <input type="tel" 
+                               id="phone" 
+                               name="phone" 
+                               required
+                               class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                               placeholder="+7 (999) 999-99-99">
+                    </div>
+
+                    <!-- Служба доставки -->
+                    <div>
+                        <label for="delivery_service" class="block text-sm font-medium text-text-primary mb-2">
+                            Служба доставки *
+                        </label>
+                        <select id="delivery_service" 
+                                name="delivery_service" 
+                                required
+                                class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition">
+                            <option value="">Выберите службу доставки</option>
+                            <option value="Почта России">Почта России</option>
+                            <option value="Boxberry">Boxberry</option>
+                            <option value="СДЭК">СДЭК</option>
+                        </select>
+                    </div>
+
+                    <!-- Адрес ПВЗ -->
+                    <div>
+                        <label for="delivery_address" class="block text-sm font-medium text-text-primary mb-2">
+                            Адрес пункта выдачи (ПВЗ) *
+                        </label>
+                        <textarea id="delivery_address" 
+                                  name="delivery_address" 
+                                  required
+                                  rows="3"
+                                  class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition resize-none"
+                                  placeholder="Город, улица, номер ПВЗ, код отделения..."></textarea>
+                        <p class="text-xs text-text-secondary mt-1">
+                            Укажите полный адрес пункта выдачи выбранной службы доставки
+                        </p>
+                    </div>
+
+                    <!-- Комментарий -->
+                    <div>
+                        <label for="comment" class="block text-sm font-medium text-text-primary mb-2">
+                            Комментарий к заказу
+                        </label>
+                        <textarea id="comment" 
+                                  name="comment" 
+                                  rows="2"
+                                  class="w-full px-4 py-3 bg-dark-800 border border-white/10 rounded-xl text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition resize-none"
+                                  placeholder="Дополнительные пожелания или требования..."></textarea>
+                    </div>
+
+                    <!-- Кнопка отправки -->
+                    <button type="submit" 
+                            id="submitBtn"
+                            class="w-full py-4 bg-accent text-dark-900 font-bold rounded-xl hover:bg-opacity-90 transition transform hover:scale-105 shadow-lg hover:shadow-accent/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {% if item.price %}
+                            Перейти к оплате
+                        {% else %}
+                            Отправить заявку
+                        {% endif %}
+                    </button>
+
+                    <p class="text-xs text-text-secondary text-center mt-4">
+                        Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
+                    </p>
+                </form>
+            </div>
+        </div>
     </div>
 </section>
 
-<script>
-    document.getElementById('order-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
+<!-- Уведомление об успехе -->
+<div id="successNotification" class="fixed top-4 right-4 glass p-4 rounded-xl border border-green-500/20 hidden">
+    <div class="flex items-center space-x-2 text-green-400">
+        <span>✅</span>
+        <span>Заказ успешно оформлен!</span>
+    </div>
+</div>
 
-        try {
-            const res = await fetch('/api/create-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const result = await res.json();
+<!-- Уведомление об ошибке -->
+<div id="errorNotification" class="fixed top-4 right-4 glass p-4 rounded-xl border border-red-500/20 hidden">
+    <div class="flex items-center space-x-2 text-red-400">
+        <span>❌</span>
+        <span id="errorText">Произошла ошибка</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.textContent;
+    
+    // Блокируем кнопку
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Обработка...';
+    
+    try {
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        
+        const response = await fetch('{{ url_for("create_payment") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Если товар платный - редирект на оплату
             if (result.payment_url) {
                 window.location.href = result.payment_url;
             } else {
-                alert('Ошибка: ' + (result.message || 'Не удалось создать платёж'));
+                // Если товар "по запросу" - показываем уведомление
+                showNotification('success');
+                setTimeout(() => {
+                    window.location.href = '{{ url_for("catalog") }}';
+                }, 2000);
             }
-        } catch (err) {
-            alert('Ошибка подключения');
+        } else {
+            throw new Error(result.error || 'Произошла ошибка');
         }
-    });
+        
+    } catch (error) {
+        showNotification('error', error.message);
+        console.error('Ошибка:', error);
+    } finally {
+        // Разблокируем кнопку
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+});
+
+function showNotification(type, message = '') {
+    const success = document.getElementById('successNotification');
+    const error = document.getElementById('errorNotification');
+    const errorText = document.getElementById('errorText');
+    
+    // Скрываем все уведомления
+    success.classList.add('hidden');
+    error.classList.add('hidden');
+    
+    // Показываем нужное уведомление
+    if (type === 'success') {
+        success.classList.remove('hidden');
+    } else {
+        errorText.textContent = message;
+        error.classList.remove('hidden');
+    }
+    
+    // Автоматически скрываем через 5 секунд
+    setTimeout(() => {
+        success.classList.add('hidden');
+        error.classList.add('hidden');
+    }, 5000);
+}
+
+// Динамическое обновление placeholder для адреса ПВЗ
+document.getElementById('delivery_service').addEventListener('change', function() {
+    const addressField = document.getElementById('delivery_address');
+    const service = this.value;
+    
+    let placeholder = 'Город, улица, номер ПВЗ...';
+    
+    switch(service) {
+        case 'Почта России':
+            placeholder = 'Например: Москва, ул. Тверская, д. 10, индекс 125009, отделение почтовой связи №123';
+            break;
+        case 'Boxberry':
+            placeholder = 'Например: Санкт-Петербург, Невский пр-т, д. 100, ПВЗ Boxberry №456';
+            break;
+        case 'СДЭК':
+            placeholder = 'Например: Екатеринбург, ул. Ленина, д. 25, ПВЗ СДЭК №789';
+            break;
+    }
+    
+    addressField.placeholder = placeholder;
+});
 </script>
 {% endblock %}
