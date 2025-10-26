@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Управление статьями</h1>
+        <a href="{{ url_for('admin_article_form') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            + Новая статья
+        </a>
+    </div>
+
+    {% if articles %}
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Изображение</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Заголовок</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for article in articles %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <img src="{{ url_for('static', filename='content/' + article.image) }}" 
+                             alt="{{ article.title }}" 
+                             class="w-16 h-16 object-cover rounded">
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">{{ article.title }}</div>
+                        <div class="text-sm text-gray-500">{{ article.excerpt[:100] }}...</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ article.date | format_date if article.date else 'Без даты' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{{ url_for('admin_article_form', article_id=article.id) }}" 
+                           class="text-indigo-600 hover:text-indigo-900 mr-4">Редактировать</a>
+                        <form action="{{ url_for('admin_article_delete', article_id=article.id) }}" 
+                              method="POST" class="inline">
+                            <button type="submit" 
+                                    onclick="return confirm('Удалить статью?')"
+                                    class="text-red-600 hover:text-red-900">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-8">
+        <p class="text-gray-500">Статьи пока не добавлены.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

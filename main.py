@@ -739,6 +739,36 @@ def admin_portfolio_form(project_id=None):
 
     return render_template('admin/portfolio_form.html', project=project)
 
+@app.route('/admin/portfolio/delete/<int:project_id>', methods=['POST'])
+@login_required
+def admin_portfolio_delete(project_id):
+    projects = load_portfolio()
+    
+    # Find and remove the project
+    project_to_delete = None
+    updated_projects = []
+    for project in projects:
+        if project.get('id') == project_id:
+            project_to_delete = project
+        else:
+            updated_projects.append(project)
+    
+    if project_to_delete:
+        # Delete the associated image file
+        if project_to_delete.get('image'):
+            image_path = os.path.join(app.root_path, 'static', 'content', project_to_delete['image'])
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        
+        # Save updated projects list
+        filepath = os.path.join(app.root_path, 'data', 'portfolio.json')
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(updated_projects, f, ensure_ascii=False, indent=2)
+        
+        return redirect(url_for('admin_portfolio'))
+    else:
+        return "Работа не найдена", 404
+
 # Загрузка заказов
 def load_orders():
     return load_data('orders.json', [])
@@ -1097,6 +1127,129 @@ def admin_custom_order_delete(order_id):
         with open(orders_file, 'w', encoding='utf-8') as f:
             json.dump(orders, f, ensure_ascii=False, indent=2)
     return redirect(url_for('admin_custom_orders'))
+
+@app.route('/admin/articles')
+@login_required
+def admin_articles():
+    articles = load_articles()
+    return render_template('admin/articles_list.html', articles=articles)
+
+@app.route('/admin/articles/new', methods=['GET', 'POST'])
+@app.route('/admin/articles/edit/<int:article_id>', methods=['GET', 'POST'])
+@login_required
+def admin_article_form(article_id=None):
+    article = None
+    if article_id:
+        articles = load_articles()
+        article = next((a for a in articles if a.get('id') == article_id), None)
+        if not article:
+            return "Статья не найдена", 404
+
+    if request.method == 'POST':
+        try:
+            # Получаем данные из формы
+            title = request.form.get('title', '').strip()
+            excerpt = request.form.get('excerpt', '').strip()
+            content = request.form.get('content', '').strip()
+            date = request.form.get('date', '').strip()
+            
+            # Генерируем slug из заголовка
+            slug = request.form.get('slug', '').strip()
+            if not slug and title:
+                import re
+                slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
+            
+            # Валидация обязательных полей
+            if not title or not excerpt or not content:
+                return "Заполните обязательные поля: заголовок, краткое описание, содержание", 400
+
+            # Обработка изображения
+            image_file = request.files.get('image')
+            image_filename = None
+
+            if image_file and image_file.filename:
+                image_filename = save_image_as_webp(image_file)
+                if not image_filename:
+                    return "Недопустимый формат изображения", 400
+            elif article_id and article:
+                # При редактировании — оставляем старое изображение
+                image_filename = article.get('image')
+            else:
+                return "Изображение обязательно", 400
+
+            # Загружаем текущие статьи
+            articles = load_articles()
+
+            if article_id:
+                # Редактирование существующей статьи
+                for i, art in enumerate(articles):
+                    if art.get('id') == article_id:
+                        # Удаляем старое изображение, если загружено новое
+                        old_image = art.get('image')
+                        if old_image and old_image != image_filename:
+                            old_path = os.path.join(app.root_path, 'static', 'content', old_image)
+                            if os.path.exists(old_path):
+                                os.remove(old_path)
+                        
+                        articles[i] = {
+                            "id": article_id,
+                            "title": title,
+                            "slug": slug,
+                            "excerpt": excerpt,
+                            "content": content,
+                            "date": date,
+                            "image": image_filename
+                        }
+                        break
+            else:
+                # Создание новой статьи
+                new_id = max([art.get('id', 0) for art in articles], default=0) + 1
+                articles.append({
+                    "id": new_id,
+                    "title": title,
+                    "slug": slug,
+                    "excerpt": excerpt,
+                    "content": content,
+                    "date": date or datetime.now().strftime('%Y-%m-%d'),
+                    "image": image_filename
+                })
+
+            # Сохраняем статьи
+            with open(os.path.join(app.root_path, 'data', 'articles.json'), 'w', encoding='utf-8') as f:
+                json.dump(articles, f, ensure_ascii=False, indent=2)
+
+            return redirect(url_for('admin_articles'))
+
+        except Exception as e:
+            print(f"Ошибка при сохранении статьи: {e}")
+            return f"Произошла ошибка при сохранении: {e}", 500
+
+    # GET запрос - отображаем форму
+    return render_template('admin/article_form.html', article=article)
+
+@app.route('/admin/articles/delete/<int:article_id>', methods=['POST'])
+@login_required
+def admin_article_delete(article_id):
+    articles = load_articles()
+    
+    # Находим статью для удаления
+    article_to_delete = next((a for a in articles if a.get('id') == article_id), None)
+    
+    if article_to_delete:
+        # Удаляем связанное изображение
+        if article_to_delete.get('image'):
+            image_path = os.path.join(app.root_path, 'static', 'content', article_to_delete['image'])
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        
+        # Удаляем статью из списка
+        articles = [a for a in articles if a.get('id') != article_id]
+        
+        # Сохраняем обновленный список
+        with open(os.path.join(app.root_path, 'data', 'articles.json'), 'w', encoding='utf-8') as f:
+            json.dump(articles, f, ensure_ascii=False, indent=2)
+    
+    return redirect(url_for('admin_articles'))
 
 if __name__ == '__main__':
     app.run(debug=False)
